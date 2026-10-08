@@ -102,9 +102,9 @@ final class Dropper extends Opaque implements AnyFacing, PoweredByRedstone{
 		$target = $world->getTile($front);
 		if($target instanceof Container){
 			// Workstations need sided slot rules; do not insert into their output or recipe slots.
-			if(!$target instanceof \pocketmine\block\tile\Chest && !$target instanceof \pocketmine\block\tile\Barrel &&
-				!$target instanceof \pocketmine\block\tile\Hopper && !$target instanceof TileDropper &&
-				!$target instanceof \pocketmine\block\tile\ShulkerBox){
+			if(!$target instanceof tile\Chest && !$target instanceof tile\Barrel &&
+				!$target instanceof tile\Hopper && !$target instanceof TileDropper &&
+				!$target instanceof tile\ShulkerBox){
 				return false;
 			}
 			$destination = $target->getInventory();
