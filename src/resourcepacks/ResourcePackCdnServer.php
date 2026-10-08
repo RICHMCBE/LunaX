@@ -25,9 +25,11 @@ namespace pocketmine\resourcepacks;
 
 use pocketmine\thread\log\ThreadSafeLogger;
 use pocketmine\thread\Thread;
+use pocketmine\utils\Utils;
+use function count;
 use function explode;
-use function feof;
 use function fclose;
+use function feof;
 use function fgets;
 use function filesize;
 use function fopen;
@@ -35,6 +37,7 @@ use function fread;
 use function fwrite;
 use function is_array;
 use function is_file;
+use function is_string;
 use function json_decode;
 use function json_last_error;
 use function ltrim;
@@ -80,9 +83,14 @@ class ResourcePackCdnServer extends Thread{
 	protected function onRun() : void{
 		\GlobalLogger::set($this->logger);
 
-		$packFiles = json_decode($this->packFilesJson, true);
-		if(!is_array($packFiles) || json_last_error() !== JSON_ERROR_NONE){
-			$packFiles = [];
+		$decodedPackFiles = json_decode($this->packFilesJson, true);
+		$packFiles = [];
+		if(is_array($decodedPackFiles) && json_last_error() === JSON_ERROR_NONE){
+			foreach(Utils::promoteKeys($decodedPackFiles) as $packId => $path){
+				if(is_string($packId) && is_string($path)){
+					$packFiles[$packId] = $path;
+				}
+			}
 		}
 
 		$socket = stream_socket_server("tcp://$this->bindAddress:$this->port", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN);
@@ -134,7 +142,7 @@ class ResourcePackCdnServer extends Thread{
 			}
 		}
 
-		$parts = explode(" ", trim($requestLine));
+		$parts = explode(" ", trim($requestLine), 3);
 		if(count($parts) < 2 || $parts[0] !== "GET"){
 			fwrite($conn, "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n");
 			fclose($conn);
