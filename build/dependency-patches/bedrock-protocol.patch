@@ -1,0 +1,795 @@
+diff --git a/src/AddActorPacket.php b/src/AddActorPacket.php
+index a55398a..e52f4c9 100644
+--- a/src/AddActorPacket.php
++++ b/src/AddActorPacket.php
+@@ -23,12 +23,14 @@ use pocketmine\network\mcpe\protocol\types\entity\Attribute;
+ use pocketmine\network\mcpe\protocol\types\entity\EntityLink;
+ use pocketmine\network\mcpe\protocol\types\entity\MetadataProperty;
+ use pocketmine\network\mcpe\protocol\types\entity\PropertySyncData;
++use pocketmine\network\mcpe\protocol\types\PassengerOfBlockArguments;
+ 
+ class AddActorPacket extends DataPacket implements ClientboundPacket{
+ 	public const NETWORK_ID = ProtocolInfo::ADD_ACTOR_PACKET;
+ 
+ 	public int $actorUniqueId;
+ 	public int $actorRuntimeId;
++	public ?PassengerOfBlockArguments $passengerBlockData = null;
+ 	public string $type;
+ 	public Vector3 $position;
+ 	public ?Vector3 $motion = null;
+@@ -77,10 +79,12 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
+ 		array $metadata,
+ 		PropertySyncData $syncedProperties,
+ 		array $links,
++		?PassengerOfBlockArguments $passengerBlockData = null,
+ 	) : self{
+ 		$result = new self;
+ 		$result->actorUniqueId = $actorUniqueId;
+ 		$result->actorRuntimeId = $actorRuntimeId;
++		$result->passengerBlockData = $passengerBlockData;
+ 		$result->type = $type;
+ 		$result->position = $position;
+ 		$result->motion = $motion;
+@@ -118,6 +122,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
+ 		$this->syncedProperties = PropertySyncData::read($in);
+ 
+ 		$this->links = CommonTypes::readList($in, CommonTypes::getEntityLink(...));
++		$this->passengerBlockData = CommonTypes::readOptional($in, PassengerOfBlockArguments::read(...));
+ 	}
+ 
+ 	protected function encodePayload(ByteBufferWriter $out) : void{
+@@ -142,6 +147,7 @@ class AddActorPacket extends DataPacket implements ClientboundPacket{
+ 		$this->syncedProperties->write($out);
+ 
+ 		CommonTypes::writeList($out, $this->links, CommonTypes::putEntityLink(...));
++		CommonTypes::writeOptional($out, $this->passengerBlockData, fn(ByteBufferWriter $out, PassengerOfBlockArguments $data) => $data->write($out));
+ 	}
+ 
+ 	public function handle(PacketHandlerInterface $handler) : bool{
+diff --git a/src/AddPlayerPacket.php b/src/AddPlayerPacket.php
+index 7271013..24979de 100644
+--- a/src/AddPlayerPacket.php
++++ b/src/AddPlayerPacket.php
+@@ -26,6 +26,7 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityLink;
+ use pocketmine\network\mcpe\protocol\types\entity\MetadataProperty;
+ use pocketmine\network\mcpe\protocol\types\entity\PropertySyncData;
+ use pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper;
++use pocketmine\network\mcpe\protocol\types\PassengerOfBlockArguments;
+ use Ramsey\Uuid\UuidInterface;
+ use function count;
+ 
+@@ -35,6 +36,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
+ 	public UuidInterface $uuid;
+ 	public string $username;
+ 	public int $actorRuntimeId;
++	public ?PassengerOfBlockArguments $passengerBlockData = null;
+ 	public string $platformChatId = "";
+ 	public Vector3 $position;
+ 	public ?Vector3 $motion = null;
+@@ -81,11 +83,13 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
+ 		array $links,
+ 		string $deviceId,
+ 		int $buildPlatform,
++		?PassengerOfBlockArguments $passengerBlockData = null,
+ 	) : self{
+ 		$result = new self;
+ 		$result->uuid = $uuid;
+ 		$result->username = $username;
+ 		$result->actorRuntimeId = $actorRuntimeId;
++		$result->passengerBlockData = $passengerBlockData;
+ 		$result->platformChatId = $platformChatId;
+ 		$result->position = $position;
+ 		$result->motion = $motion;
+@@ -125,6 +129,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
+ 			$this->links[$i] = CommonTypes::getEntityLink($in);
+ 		}
+ 
++		$this->passengerBlockData = CommonTypes::readOptional($in, PassengerOfBlockArguments::read(...));
+ 		$this->deviceId = CommonTypes::getString($in);
+ 		$this->buildPlatform = LE::readSignedInt($in);
+ 	}
+@@ -151,6 +156,7 @@ class AddPlayerPacket extends DataPacket implements ClientboundPacket{
+ 			CommonTypes::putEntityLink($out, $link);
+ 		}
+ 
++		CommonTypes::writeOptional($out, $this->passengerBlockData, fn(ByteBufferWriter $out, PassengerOfBlockArguments $data) => $data->write($out));
+ 		CommonTypes::putString($out, $this->deviceId);
+ 		LE::writeSignedInt($out, $this->buildPlatform);
+ 	}
+diff --git a/src/ClientboundMatchmakingStatePacket.php b/src/ClientboundMatchmakingStatePacket.php
+index 2f48175..0f4cc80 100644
+--- a/src/ClientboundMatchmakingStatePacket.php
++++ b/src/ClientboundMatchmakingStatePacket.php
+@@ -1,5 +1,15 @@
+ <?php
+ 
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
+ declare(strict_types=1);
+ 
+ namespace pocketmine\network\mcpe\protocol;
+@@ -8,6 +18,7 @@ use pmmp\encoding\Byte;
+ use pmmp\encoding\ByteBufferReader;
+ use pmmp\encoding\ByteBufferWriter;
+ use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++use pocketmine\network\mcpe\protocol\types\MatchmakingStateOptions;
+ 
+ final class ClientboundMatchmakingStatePacket extends DataPacket implements ClientboundPacket{
+ 	public const NETWORK_ID = ProtocolInfo::CLIENTBOUND_MATCHMAKING_STATE_PACKET;
+@@ -15,7 +26,14 @@ final class ClientboundMatchmakingStatePacket extends DataPacket implements Clie
+ 	public const STATE_IDLE = 0;
+ 	public const STATE_MATCHMAKING = 1;
+ 	public const STATE_MATCH_FOUND = 2;
++	public const STATE_CANCELED = 3;
++	public const STATE_PLAYER_LEFT_PARTY = 4;
++	public const STATE_PLAYER_LEFT_SERVER = 5;
++	public const STATE_SERVER_SHUTDOWN = 6;
++	public const STATE_TIMED_OUT = 7;
++	public const STATE_REQUEUE_AS_PARTY = 8;
+ 
++	public ?MatchmakingStateOptions $options = null;
+ 	private int $state;
+ 	private string $destinationName;
+ 
+@@ -33,11 +51,13 @@ final class ClientboundMatchmakingStatePacket extends DataPacket implements Clie
+ 	protected function decodePayload(ByteBufferReader $in) : void{
+ 		$this->state = Byte::readUnsigned($in);
+ 		$this->destinationName = CommonTypes::getString($in);
++		$this->options = CommonTypes::readOptional($in, MatchmakingStateOptions::read(...));
+ 	}
+ 
+ 	protected function encodePayload(ByteBufferWriter $out) : void{
+ 		Byte::writeUnsigned($out, $this->state);
+ 		CommonTypes::putString($out, $this->destinationName);
++		CommonTypes::writeOptional($out, $this->options, fn(ByteBufferWriter $out, MatchmakingStateOptions $options) => $options->write($out));
+ 	}
+ 
+ 	public function handle(PacketHandlerInterface $handler) : bool{
+diff --git a/src/PacketHandlerDefaultImplTrait.php b/src/PacketHandlerDefaultImplTrait.php
+index 9d9d3fd..9dddbb4 100644
+--- a/src/PacketHandlerDefaultImplTrait.php
++++ b/src/PacketHandlerDefaultImplTrait.php
+@@ -961,4 +961,20 @@ trait PacketHandlerDefaultImplTrait{
+ 	public function handleServerboundMatchmakingCancel(ServerboundMatchmakingCancelPacket $packet) : bool{
+ 		return false;
+ 	}
++
++	public function handleSetPassengerOfBlock(SetPassengerOfBlockPacket $packet) : bool{
++		return false;
++	}
++
++	public function handleServerboundCursorItemDrag(ServerboundCursorItemDragPacket $packet) : bool{
++		return false;
++	}
++
++	public function handleClientboundPlayAudioContent(ClientboundPlayAudioContentPacket $packet) : bool{
++		return false;
++	}
++
++	public function handleServerboundRegisterAudioContent(ServerboundRegisterAudioContentPacket $packet) : bool{
++		return false;
++	}
+ }
+diff --git a/src/PacketHandlerInterface.php b/src/PacketHandlerInterface.php
+index 06a4652..835ba65 100644
+--- a/src/PacketHandlerInterface.php
++++ b/src/PacketHandlerInterface.php
+@@ -487,4 +487,12 @@ interface PacketHandlerInterface{
+ 	public function handleClientboundStonecutterSetRecipe(ClientboundStonecutterSetRecipePacket $packet) : bool;
+ 
+ 	public function handleServerboundMatchmakingCancel(ServerboundMatchmakingCancelPacket $packet) : bool;
++
++	public function handleSetPassengerOfBlock(SetPassengerOfBlockPacket $packet) : bool;
++
++	public function handleServerboundCursorItemDrag(ServerboundCursorItemDragPacket $packet) : bool;
++
++	public function handleClientboundPlayAudioContent(ClientboundPlayAudioContentPacket $packet) : bool;
++
++	public function handleServerboundRegisterAudioContent(ServerboundRegisterAudioContentPacket $packet) : bool;
+ }
+diff --git a/src/PacketPool.php b/src/PacketPool.php
+index c38f1a4..012800a 100644
+--- a/src/PacketPool.php
++++ b/src/PacketPool.php
+@@ -270,6 +270,10 @@ class PacketPool{
+ 		$this->registerPacket(new ServerboundStonecutterSetRecipePacket());
+ 		$this->registerPacket(new ClientboundStonecutterSetRecipePacket());
+ 		$this->registerPacket(new ServerboundMatchmakingCancelPacket());
++		$this->registerPacket(new SetPassengerOfBlockPacket());
++		$this->registerPacket(new ServerboundCursorItemDragPacket());
++		$this->registerPacket(new ClientboundPlayAudioContentPacket());
++		$this->registerPacket(new ServerboundRegisterAudioContentPacket());
+ 	}
+ 
+ 	public function registerPacket(Packet $packet) : void{
+diff --git a/src/ProtocolInfo.php b/src/ProtocolInfo.php
+index c5b604a..811f2b1 100644
+--- a/src/ProtocolInfo.php
++++ b/src/ProtocolInfo.php
+@@ -32,11 +32,11 @@ final class ProtocolInfo{
+ 	 */
+ 
+ 	/** Actual Minecraft: PE protocol version */
+-	public const CURRENT_PROTOCOL = 2211;
++	public const CURRENT_PROTOCOL = 2225;
+ 	/** Display version shown in the server logs. This should match the version on the game's home screen. */
+-	public const MINECRAFT_VERSION = 'v26.60.25 beta';
++	public const MINECRAFT_VERSION = 'v26.60.30 beta';
+ 	/** Version sent on the network for client side compatibility checks. This may differ from the display version. */
+-	public const MINECRAFT_VERSION_NETWORK = '1.26.60.25';
++	public const MINECRAFT_VERSION_NETWORK = '1.26.60.30';
+ 
+ 	public const LOGIN_PACKET = 0x01;
+ 	public const PLAY_STATUS_PACKET = 0x02;
+@@ -291,5 +291,9 @@ final class ProtocolInfo{
+ 	public const SERVERBOUND_STONECUTTER_SET_RECIPE_PACKET = 0x162;
+ 	public const CLIENTBOUND_STONECUTTER_SET_RECIPE_PACKET = 0x163;
+ 	public const SERVERBOUND_MATCHMAKING_CANCEL_PACKET = 0x164;
++	public const SET_PASSENGER_OF_BLOCK_PACKET = 0x165;
++	public const SERVERBOUND_CURSOR_ITEM_DRAG_PACKET = 0x166;
++	public const CLIENTBOUND_PLAY_AUDIO_CONTENT_PACKET = 0x167;
++	public const SERVERBOUND_REGISTER_AUDIO_CONTENT_PACKET = 0x168;
+ 
+ }
+diff --git a/src/serializer/CommonTypes.php b/src/serializer/CommonTypes.php
+index ec0f288..06f63c1 100644
+--- a/src/serializer/CommonTypes.php
++++ b/src/serializer/CommonTypes.php
+@@ -282,6 +282,8 @@ final class CommonTypes{
+ 		$stackId = $hasNetId ? VarInt::readSignedInt($in) : 0;
+ 
+ 		$blockRuntimeId = VarInt::readUnsignedInt($in);
++		// Hash-based block IDs use the same 32 bits as signed IDs in other item packets.
++		$blockRuntimeId = ($blockRuntimeId & 0x7fffffff) - ($blockRuntimeId & 0x80000000);
+ 		$rawExtraData = self::getString($in);
+ 
+ 		return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData));
+@@ -297,7 +299,7 @@ final class CommonTypes{
+ 			VarInt::writeSignedInt($out, $itemStackWrapper->getStackId());
+ 		}
+ 
+-		VarInt::writeUnsignedInt($out, $itemStackWrapper->getItemStack()->getBlockRuntimeId());
++		VarInt::writeUnsignedInt($out, $itemStackWrapper->getItemStack()->getBlockRuntimeId() & 0xffffffff);
+ 		self::putString($out, $itemStackWrapper->getItemStack()->getRawExtraData());
+ 	}
+ 
+diff --git a/src/types/LevelSettings.php b/src/types/LevelSettings.php
+index fd379f4..5e9d35a 100644
+--- a/src/types/LevelSettings.php
++++ b/src/types/LevelSettings.php
+@@ -37,6 +37,7 @@ final class LevelSettings{
+ 	public int $editorWorldType = EditorWorldType::NON_EDITOR;
+ 	public bool $createdInEditorMode = false;
+ 	public bool $exportedFromEditorMode = false;
++	public int $editorLevelMigrationVersion = 0;
+ 	public int $time = -1;
+ 	public int $eduEditionOffer = EducationEditionOffer::NONE;
+ 	public bool $hasEduFeaturesEnabled = false;
+@@ -111,6 +112,7 @@ final class LevelSettings{
+ 		$this->editorWorldType = VarInt::readSignedInt($in);
+ 		$this->createdInEditorMode = CommonTypes::getBool($in);
+ 		$this->exportedFromEditorMode = CommonTypes::getBool($in);
++		$this->editorLevelMigrationVersion = Byte::readSigned($in);
+ 		$this->time = VarInt::readSignedInt($in);
+ 		$this->eduEditionOffer = VarInt::readSignedInt($in);
+ 		$this->hasEduFeaturesEnabled = CommonTypes::getBool($in);
+@@ -164,6 +166,7 @@ final class LevelSettings{
+ 		VarInt::writeSignedInt($out, $this->editorWorldType);
+ 		CommonTypes::putBool($out, $this->createdInEditorMode);
+ 		CommonTypes::putBool($out, $this->exportedFromEditorMode);
++		Byte::writeSigned($out, $this->editorLevelMigrationVersion);
+ 		VarInt::writeSignedInt($out, $this->time);
+ 		VarInt::writeSignedInt($out, $this->eduEditionOffer);
+ 		CommonTypes::putBool($out, $this->hasEduFeaturesEnabled);
+diff --git a/src/types/LevelSoundEvent.php b/src/types/LevelSoundEvent.php
+index 697ecc2..993c50a 100644
+--- a/src/types/LevelSoundEvent.php
++++ b/src/types/LevelSoundEvent.php
+@@ -596,5 +596,7 @@ final class LevelSoundEvent{
+ 	public const MOUNT = "mount";
+ 	public const DISMOUNT = "dismount";
+ 	public const STRAW_BED_BREAK_LEAVE = "straw_bed.break_leave";
++	public const ICE_BALL_BREAK = "ice_ball.break";
++	public const UNDEFINED = "undefined";
+ 
+ }
+diff --git a/src/types/inventory/ContainerUIIds.php b/src/types/inventory/ContainerUIIds.php
+index 01b936a..b178950 100644
+--- a/src/types/inventory/ContainerUIIds.php
++++ b/src/types/inventory/ContainerUIIds.php
+@@ -87,4 +87,8 @@ final class ContainerUIIds{
+ 	public const RECIPE_FOOD_CONTAINER = 64;
+ 	public const RECIPE_BLOCKS_CONTAINER = 65;
+ 	public const RECIPE_FURNACE_ITEMS_CONTAINER = 66;
++	public const RESERVED_CONTAINER_A = 67;
++	public const RESERVED_CONTAINER_B = 68;
++	public const RESERVED_CONTAINER_C = 69;
++	public const RESERVED_CONTAINER_D = 70;
+ }
+diff --git a/src/types/inventory/WindowTypes.php b/src/types/inventory/WindowTypes.php
+index feea84e..e0ec40e 100644
+--- a/src/types/inventory/WindowTypes.php
++++ b/src/types/inventory/WindowTypes.php
+@@ -60,4 +60,5 @@ final class WindowTypes{
+ 	public const CHEST_BOAT = 34;
+ 	public const DECORATED_POT = 35;
+ 	public const CRAFTER = 36;
++	public const RESERVED_CONTAINER_TYPE = 38;
+ }
+diff --git a/src/types/inventory/stackrequest/ItemStackRequest.php b/src/types/inventory/stackrequest/ItemStackRequest.php
+index 084673b..3ef9606 100644
+--- a/src/types/inventory/stackrequest/ItemStackRequest.php
++++ b/src/types/inventory/stackrequest/ItemStackRequest.php
+@@ -59,6 +59,7 @@ final class ItemStackRequest{
+ 	 */
+ 	private static function readAction(ByteBufferReader $in, int $typeId) : ItemStackRequestAction{
+ 		return match($typeId){
++			ReservedStackRequestAction::ID => ReservedStackRequestAction::read($in),
+ 			TakeStackRequestAction::ID => TakeStackRequestAction::read($in),
+ 			PlaceStackRequestAction::ID => PlaceStackRequestAction::read($in),
+ 			SwapStackRequestAction::ID => SwapStackRequestAction::read($in),
+diff --git a/src/types/inventory/stackrequest/ItemStackRequestActionType.php b/src/types/inventory/stackrequest/ItemStackRequestActionType.php
+index d4bade0..fd3169d 100644
+--- a/src/types/inventory/stackrequest/ItemStackRequestActionType.php
++++ b/src/types/inventory/stackrequest/ItemStackRequestActionType.php
+@@ -36,8 +36,9 @@ final class ItemStackRequestActionType{
+ 	public const CRAFTING_RECIPE_OPTIONAL = 13; //anvil/cartography table rename
+ 	public const CRAFTING_GRINDSTONE = 14;
+ 	public const CRAFTING_LOOM = 15;
+-	public const CRAFTING_NON_IMPLEMENTED_DEPRECATED_ASK_TY_LAING = 16;
+-	public const CRAFTING_RESULTS_DEPRECATED_ASK_TY_LAING = 17; //no idea what this is for
++	public const CRAFTING_RESERVED = 16;
++	public const CRAFTING_NON_IMPLEMENTED_DEPRECATED_ASK_TY_LAING = 17;
++	public const CRAFTING_RESULTS_DEPRECATED_ASK_TY_LAING = 18; //no idea what this is for
+ 
+ 	public const INNER_TYPES = [
+ 		self::TAKE => 0,
+@@ -58,7 +59,8 @@ final class ItemStackRequestActionType{
+ 		self::CRAFTING_RECIPE_OPTIONAL => 15, //anvil/cartography table rename
+ 		self::CRAFTING_GRINDSTONE => 16,
+ 		self::CRAFTING_LOOM => 17,
+-		self::CRAFTING_NON_IMPLEMENTED_DEPRECATED_ASK_TY_LAING => 18,
+-		self::CRAFTING_RESULTS_DEPRECATED_ASK_TY_LAING => 19, //no idea what this is for
++		self::CRAFTING_RESERVED => 18,
++		self::CRAFTING_NON_IMPLEMENTED_DEPRECATED_ASK_TY_LAING => 19,
++		self::CRAFTING_RESULTS_DEPRECATED_ASK_TY_LAING => 20, //no idea what this is for
+ 	];
+ }
+diff --git a/src/ClientboundPlayAudioContentPacket.php b/src/ClientboundPlayAudioContentPacket.php
+new file mode 100644
+--- /dev/null
++++ b/src/ClientboundPlayAudioContentPacket.php
+@@ -0,0 +1,111 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol;
++
++use pmmp\encoding\Byte;
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++use pmmp\encoding\LE;
++use pmmp\encoding\VarInt;
++use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++use pocketmine\network\mcpe\protocol\types\BlockPosition;
++
++class ClientboundPlayAudioContentPacket extends DataPacket implements ClientboundPacket{
++	public const NETWORK_ID = ProtocolInfo::CLIENTBOUND_PLAY_AUDIO_CONTENT_PACKET;
++
++	public string $sharedMetadata;
++	public string $playbackContent;
++	public int $playbackType;
++	public string $soundName;
++	public float $x;
++	public float $y;
++	public float $z;
++	public float $volume;
++	public float $pitch;
++	public int $loopCount = 0;
++	public bool $bypassListenerRangeCheck = false;
++	public ?int $serverSoundHandle = null;
++	public ?float $playbackPositionSeconds = null;
++
++	/**
++	 * @generate-create-func
++	 */
++	public static function create(
++		string $sharedMetadata,
++		string $playbackContent,
++		int $playbackType,
++		string $soundName,
++		float $x,
++		float $y,
++		float $z,
++		float $volume,
++		float $pitch,
++		int $loopCount,
++		bool $bypassListenerRangeCheck,
++		?int $serverSoundHandle,
++		?float $playbackPositionSeconds,
++	) : self{
++		$result = new self;
++		$result->sharedMetadata = $sharedMetadata;
++		$result->playbackContent = $playbackContent;
++		$result->playbackType = $playbackType;
++		$result->soundName = $soundName;
++		$result->x = $x;
++		$result->y = $y;
++		$result->z = $z;
++		$result->volume = $volume;
++		$result->pitch = $pitch;
++		$result->loopCount = $loopCount;
++		$result->bypassListenerRangeCheck = $bypassListenerRangeCheck;
++		$result->serverSoundHandle = $serverSoundHandle;
++		$result->playbackPositionSeconds = $playbackPositionSeconds;
++		return $result;
++	}
++
++	protected function decodePayload(ByteBufferReader $in) : void{
++		$this->sharedMetadata = CommonTypes::getString($in);
++		$this->playbackContent = CommonTypes::getString($in);
++		$this->playbackType = Byte::readUnsigned($in);
++		$this->soundName = CommonTypes::getString($in);
++		$blockPosition = CommonTypes::getBlockPosition($in);
++		$this->x = $blockPosition->getX() / 8;
++		$this->y = $blockPosition->getY() / 8;
++		$this->z = $blockPosition->getZ() / 8;
++		$this->volume = LE::readFloat($in);
++		$this->pitch = LE::readFloat($in);
++		$this->loopCount = VarInt::readSignedInt($in);
++		$this->bypassListenerRangeCheck = CommonTypes::getBool($in);
++		$this->serverSoundHandle = CommonTypes::readOptional($in, LE::readUnsignedLong(...));
++		$this->playbackPositionSeconds = CommonTypes::readOptional($in, LE::readFloat(...));
++	}
++
++	protected function encodePayload(ByteBufferWriter $out) : void{
++		CommonTypes::putString($out, $this->sharedMetadata);
++		CommonTypes::putString($out, $this->playbackContent);
++		Byte::writeUnsigned($out, $this->playbackType);
++		CommonTypes::putString($out, $this->soundName);
++		CommonTypes::putBlockPosition($out, new BlockPosition((int) ($this->x * 8), (int) ($this->y * 8), (int) ($this->z * 8)));
++		LE::writeFloat($out, $this->volume);
++		LE::writeFloat($out, $this->pitch);
++		VarInt::writeSignedInt($out, $this->loopCount);
++		CommonTypes::putBool($out, $this->bypassListenerRangeCheck);
++		CommonTypes::writeOptional($out, $this->serverSoundHandle, LE::writeUnsignedLong(...));
++		CommonTypes::writeOptional($out, $this->playbackPositionSeconds, LE::writeFloat(...));
++	}
++
++	public function handle(PacketHandlerInterface $handler) : bool{
++		return $handler->handleClientboundPlayAudioContent($this);
++	}
++}
+diff --git a/src/ServerboundCursorItemDragPacket.php b/src/ServerboundCursorItemDragPacket.php
+new file mode 100644
+--- /dev/null
++++ b/src/ServerboundCursorItemDragPacket.php
+@@ -0,0 +1,43 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol;
++
++use pmmp\encoding\Byte;
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++
++final class ServerboundCursorItemDragPacket extends DataPacket implements ServerboundPacket{
++	public const NETWORK_ID = ProtocolInfo::SERVERBOUND_CURSOR_ITEM_DRAG_PACKET;
++	public const STATE_START = 0;
++	public const STATE_STOP = 1;
++	public int $state;
++	public static function create(int $state) : self{
++		$result = new self;
++		$result->state = $state;
++		return $result;
++	}
++
++	protected function decodePayload(ByteBufferReader $in) : void{
++		$this->state = Byte::readUnsigned($in);
++	}
++
++	protected function encodePayload(ByteBufferWriter $out) : void{
++		Byte::writeUnsigned($out, $this->state);
++	}
++
++	public function handle(PacketHandlerInterface $handler) : bool{
++		return $handler->handleServerboundCursorItemDrag($this);
++	}
++}
+diff --git a/src/ServerboundRegisterAudioContentPacket.php b/src/ServerboundRegisterAudioContentPacket.php
+new file mode 100644
+--- /dev/null
++++ b/src/ServerboundRegisterAudioContentPacket.php
+@@ -0,0 +1,44 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol;
++
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++use pocketmine\network\mcpe\protocol\types\AudioContentRegistrationEntry;
++
++final class ServerboundRegisterAudioContentPacket extends DataPacket implements ServerboundPacket{
++	public const NETWORK_ID = ProtocolInfo::SERVERBOUND_REGISTER_AUDIO_CONTENT_PACKET;
++	/** @var list<AudioContentRegistrationEntry> */
++	public array $registrations = [];
++	/** @param list<AudioContentRegistrationEntry> $registrations */
++	public static function create(array $registrations) : self{
++		$result = new self;
++		$result->registrations = $registrations;
++		return $result;
++	}
++
++	protected function decodePayload(ByteBufferReader $in) : void{
++		$this->registrations = CommonTypes::readList($in, AudioContentRegistrationEntry::read(...));
++	}
++
++	protected function encodePayload(ByteBufferWriter $out) : void{
++		CommonTypes::writeList($out, $this->registrations, fn(ByteBufferWriter $out, AudioContentRegistrationEntry $entry) => $entry->write($out));
++	}
++
++	public function handle(PacketHandlerInterface $handler) : bool{
++		return $handler->handleServerboundRegisterAudioContent($this);
++	}
++}
+diff --git a/src/SetPassengerOfBlockPacket.php b/src/SetPassengerOfBlockPacket.php
+new file mode 100644
+--- /dev/null
++++ b/src/SetPassengerOfBlockPacket.php
+@@ -0,0 +1,46 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol;
++
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++use pocketmine\network\mcpe\protocol\types\PassengerOfBlockArguments;
++
++final class SetPassengerOfBlockPacket extends DataPacket implements ClientboundPacket{
++	public const NETWORK_ID = ProtocolInfo::SET_PASSENGER_OF_BLOCK_PACKET;
++	public int $passenger;
++	public ?PassengerOfBlockArguments $data = null;
++	public static function create(int $passenger, ?PassengerOfBlockArguments $data) : self{
++		$result = new self;
++		$result->passenger = $passenger;
++		$result->data = $data;
++		return $result;
++	}
++
++	protected function decodePayload(ByteBufferReader $in) : void{
++		$this->passenger = CommonTypes::getActorUniqueId($in);
++		$this->data = CommonTypes::readOptional($in, PassengerOfBlockArguments::read(...));
++	}
++
++	protected function encodePayload(ByteBufferWriter $out) : void{
++		CommonTypes::putActorUniqueId($out, $this->passenger);
++		CommonTypes::writeOptional($out, $this->data, fn(ByteBufferWriter $out, PassengerOfBlockArguments $data) => $data->write($out));
++	}
++
++	public function handle(PacketHandlerInterface $handler) : bool{
++		return $handler->handleSetPassengerOfBlock($this);
++	}
++}
+diff --git a/src/types/AudioContentRegistrationEntry.php b/src/types/AudioContentRegistrationEntry.php
+new file mode 100644
+--- /dev/null
++++ b/src/types/AudioContentRegistrationEntry.php
+@@ -0,0 +1,33 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol\types;
++
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++final class AudioContentRegistrationEntry{
++	public function __construct(public string $audioContentId, public string $sharedMetadata, public string $serverContent, public string $playbackContent){}
++
++	public static function read(ByteBufferReader $in) : self{
++		return new self(CommonTypes::getString($in), CommonTypes::getString($in), CommonTypes::getString($in), CommonTypes::getString($in));
++	}
++
++	public function write(ByteBufferWriter $out) : void{
++		CommonTypes::putString($out, $this->audioContentId);
++		CommonTypes::putString($out, $this->sharedMetadata);
++		CommonTypes::putString($out, $this->serverContent);
++		CommonTypes::putString($out, $this->playbackContent);
++	}
++}
+diff --git a/src/types/MatchmakingStateOptions.php b/src/types/MatchmakingStateOptions.php
+new file mode 100644
+--- /dev/null
++++ b/src/types/MatchmakingStateOptions.php
+@@ -0,0 +1,32 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol\types;
++
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++
++final class MatchmakingStateOptions{
++	public function __construct(public ?string $triggeringPlayerName = null, public ?bool $triggeredByLocalPlayer = null){}
++
++	public static function read(ByteBufferReader $in) : self{
++		return new self(CommonTypes::readOptional($in, CommonTypes::getString(...)), CommonTypes::readOptional($in, CommonTypes::getBool(...)));
++	}
++
++	public function write(ByteBufferWriter $out) : void{
++		CommonTypes::writeOptional($out, $this->triggeringPlayerName, CommonTypes::putString(...));
++		CommonTypes::writeOptional($out, $this->triggeredByLocalPlayer, CommonTypes::putBool(...));
++	}
++}
+diff --git a/src/types/PassengerOfBlockArguments.php b/src/types/PassengerOfBlockArguments.php
+new file mode 100644
+--- /dev/null
++++ b/src/types/PassengerOfBlockArguments.php
+@@ -0,0 +1,44 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol\types;
++
++use pmmp\encoding\Byte;
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++use pmmp\encoding\LE;
++use pocketmine\math\Vector3;
++use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++
++final class PassengerOfBlockArguments{
++	public function __construct(
++		public BlockPosition $blockPosition,
++		public Vector3 $offset,
++		public float $rotation,
++		public float $rotationLimit,
++		public int $emoteType
++	){}
++
++	public static function read(ByteBufferReader $in) : self{
++		return new self(CommonTypes::getBlockPosition($in), CommonTypes::getVector3($in), LE::readFloat($in), LE::readFloat($in), Byte::readUnsigned($in));
++	}
++
++	public function write(ByteBufferWriter $out) : void{
++		CommonTypes::putBlockPosition($out, $this->blockPosition);
++		CommonTypes::putVector3($out, $this->offset);
++		LE::writeFloat($out, $this->rotation);
++		LE::writeFloat($out, $this->rotationLimit);
++		Byte::writeUnsigned($out, $this->emoteType);
++	}
++}
+diff --git a/src/types/inventory/stackrequest/ReservedStackRequestAction.php b/src/types/inventory/stackrequest/ReservedStackRequestAction.php
+new file mode 100644
+--- /dev/null
++++ b/src/types/inventory/stackrequest/ReservedStackRequestAction.php
+@@ -0,0 +1,37 @@
++<?php
++
++/*
++ * This file is part of BedrockProtocol.
++ * Copyright (C) 2014-2022 PocketMine Team <https://github.com/pmmp/BedrockProtocol>
++ *
++ * BedrockProtocol is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ */
++
++declare(strict_types=1);
++
++namespace pocketmine\network\mcpe\protocol\types\inventory\stackrequest;
++
++use pmmp\encoding\Byte;
++use pmmp\encoding\ByteBufferReader;
++use pmmp\encoding\ByteBufferWriter;
++use pocketmine\network\mcpe\protocol\serializer\CommonTypes;
++use pocketmine\network\mcpe\protocol\types\GetTypeIdFromConstTrait;
++
++final class ReservedStackRequestAction extends ItemStackRequestAction{
++	use GetTypeIdFromConstTrait;
++	public const ID = ItemStackRequestActionType::CRAFTING_RESERVED;
++
++	public function __construct(public string $reservedId, public int $repetitions){}
++
++	public static function read(ByteBufferReader $in) : self{
++		return new self(CommonTypes::getString($in), Byte::readUnsigned($in));
++	}
++
++	public function write(ByteBufferWriter $out) : void{
++		CommonTypes::putString($out, $this->reservedId);
++		Byte::writeUnsigned($out, $this->repetitions);
++	}
++}
