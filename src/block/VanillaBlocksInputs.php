@@ -205,6 +205,8 @@ final class VanillaBlocksInputs extends RegistrySource{
 		self::register("rose_bush", fn(BID $id) => new DoublePlant($id, "Rose Bush", new Info(BreakInfo::instant())));
 		self::register("peony", fn(BID $id) => new DoublePlant($id, "Peony", new Info(BreakInfo::instant())));
 		self::register("pink_petals", fn(BID $id) => new PinkPetals($id, "Pink Petals", new Info(BreakInfo::instant())));
+		self::register("leaf_litter", fn(BID $id) => new LeafLitter($id, "Leaf Litter", new Info(BreakInfo::instant())));
+		self::register("bubble_column", fn(BID $id) => new BubbleColumn($id, "Bubble Column", new Info(new BreakInfo(0.0))));
 		self::register("double_tallgrass", fn(BID $id) => new DoubleTallGrass($id, "Double Tallgrass", new Info(BreakInfo::instant(ToolType::SHEARS, 1))));
 		self::register("large_fern", fn(BID $id) => new DoubleTallGrass($id, "Large Fern", new Info(BreakInfo::instant(ToolType::SHEARS, 1))));
 		self::register("pitcher_plant", fn(BID $id) => new DoublePlant($id, "Pitcher Plant", new Info(BreakInfo::instant())));
@@ -267,6 +269,7 @@ final class VanillaBlocksInputs extends RegistrySource{
 		self::register("hay_bale", fn(BID $id) => new HayBale($id, "Hay Bale", new Info(new BreakInfo(0.5))));
 		self::register("heavy_core", fn(BID $id) => new HeavyCore($id, "Heavy Core", new Info(BreakInfo::pickaxe(10.0, null, 6000.0))));
 		self::register("hopper", fn(BID $id) => new Hopper($id, "Hopper", new Info(BreakInfo::pickaxe(3.0, ToolTier::WOOD, 24.0))), TileHopper::class);
+		self::register("dropper", fn(BID $id) => new Dropper($id, "Dropper", new Info(BreakInfo::pickaxe(3.5, ToolTier::WOOD, 17.5))), \pocketmine\block\tile\Dropper::class);
 		self::register("ice", fn(BID $id) => new Ice($id, "Ice", new Info(BreakInfo::pickaxe(0.5))));
 
 		$updateBlockBreakInfo = new Info(new BreakInfo(1.0));
@@ -546,8 +549,10 @@ final class VanillaBlocksInputs extends RegistrySource{
 		self::register("stained_hardened_glass_pane", fn(BID $id) => new StainedHardenedGlassPane($id, "Stained Hardened Glass Pane", $hardenedGlassBreakInfo));
 		self::register("carpet", fn(BID $id) => new Carpet($id, "Carpet", new Info(new BreakInfo(0.1))));
 		self::register("concrete", fn(BID $id) => new Concrete($id, "Concrete", new Info(BreakInfo::pickaxe(1.8, ToolTier::WOOD))));
+		self::register("concrete_slab", fn(BID $id) => new ConcreteSlab($id, "Concrete", new Info(BreakInfo::pickaxe(1.8, ToolTier::WOOD, 1.8))));
+		self::register("concrete_stairs", fn(BID $id) => new ConcreteStair($id, "Concrete Stairs", new Info(BreakInfo::pickaxe(1.8, ToolTier::WOOD, 1.8))));
 		self::register("concrete_powder", fn(BID $id) => new ConcretePowder($id, "Concrete Powder", new Info(BreakInfo::shovel(0.5))));
-		self::register("wool", fn(BID $id) => new Wool($id, "Wool", new Info(new class(0.8, ToolType::SHEARS) extends BreakInfo{
+		$makeWoolBreakInfo = static fn(float $resistance) => new Info(new class(0.8, ToolType::SHEARS, 0, $resistance) extends BreakInfo{
 			public function getBreakTime(Item $item) : float{
 				$time = parent::getBreakTime($item);
 				if($item->getBlockToolType() === ToolType::SHEARS){
@@ -556,7 +561,10 @@ final class VanillaBlocksInputs extends RegistrySource{
 
 				return $time;
 			}
-		})));
+		});
+		self::register("wool", fn(BID $id) => new Wool($id, "Wool", $makeWoolBreakInfo(4.0)));
+		self::register("wool_slab", fn(BID $id) => new WoolSlab($id, "Wool", $makeWoolBreakInfo(0.8)));
+		self::register("wool_stairs", fn(BID $id) => new WoolStair($id, "Wool Stairs", $makeWoolBreakInfo(0.8)));
 
 		self::register("end_stone_brick_wall", fn(BID $id) => new Wall($id, "End Stone Brick Wall", new Info(BreakInfo::pickaxe(3.0, ToolTier::WOOD, 45.0))));
 
@@ -691,6 +699,7 @@ final class VanillaBlocksInputs extends RegistrySource{
 			WoodType::WARPED => VanillaItems::WARPED_SIGN(...),
 			WoodType::CHERRY => VanillaItems::CHERRY_SIGN(...),
 			WoodType::PALE_OAK => VanillaItems::PALE_OAK_SIGN(...),
+			WoodType::POPLAR => VanillaItems::POPLAR_SIGN(...),
 			WoodType::BAMBOO => VanillaItems::BAMBOO_SIGN(...),
 		};
 	}
@@ -711,6 +720,7 @@ final class VanillaBlocksInputs extends RegistrySource{
 			WoodType::WARPED => VanillaItems::WARPED_HANGING_SIGN(...),
 			WoodType::CHERRY => VanillaItems::CHERRY_HANGING_SIGN(...),
 			WoodType::PALE_OAK => VanillaItems::PALE_OAK_HANGING_SIGN(...),
+			WoodType::POPLAR => VanillaItems::POPLAR_HANGING_SIGN(...),
 			WoodType::BAMBOO => VanillaItems::BAMBOO_HANGING_SIGN(...),
 		};
 	}
