@@ -1562,8 +1562,8 @@ class Server{
 		if($detect !== false){
 			$localName = stream_socket_get_name($detect, false);
 			fclose($detect);
-			$colonPos = strrpos($localName, ":");
-			if($colonPos !== false){
+			$colonPos = $localName !== false ? strrpos($localName, ":") : false;
+			if($localName !== false && $colonPos !== false){
 				$host = substr($localName, 0, $colonPos);
 			}
 		}
