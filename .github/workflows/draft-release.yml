@@ -68,7 +68,7 @@ jobs:
             build_info.json
             SHA256SUMS
             release-notes.md
-            start.*
+            server-start.*
 
       - name: Publish release with update notes
         env:
@@ -77,8 +77,8 @@ jobs:
         run: |
           set -euo pipefail
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" LunaX.phar build_info.json SHA256SUMS start.* --clobber
+            gh release upload "$TAG" LunaX.phar build_info.json SHA256SUMS server-start.* --clobber
             gh release edit "$TAG" --notes-file release-notes.md --prerelease="$PRERELEASE"
           else
-            gh release create "$TAG" LunaX.phar build_info.json SHA256SUMS start.* --verify-tag --title "LunaX $TAG" --notes-file release-notes.md --prerelease="$PRERELEASE"
+            gh release create "$TAG" LunaX.phar build_info.json SHA256SUMS server-start.* --verify-tag --title "LunaX $TAG" --notes-file release-notes.md --prerelease="$PRERELEASE"
           fi
