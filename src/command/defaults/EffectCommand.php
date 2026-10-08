@@ -28,12 +28,14 @@ use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\StringToEffectParser;
 use pocketmine\lang\KnownTranslationFactory;
-use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\command\CommandHardEnum;
 use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
+use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\utils\Limits;
 use pocketmine\utils\TextFormat;
+use function array_map;
+use function array_values;
 use function count;
 use function strtolower;
 
@@ -48,10 +50,10 @@ class EffectCommand extends VanillaCommand{
 		$this->setOverloads([
 			[
 				CommandParameter::standard("player", AvailableCommandsPacket::ARG_TYPE_TARGET),
-				CommandParameter::enum("effect", new CommandHardEnum("Effect", StringToEffectParser::getInstance()->getKnownAliases()), 0),
+				CommandParameter::enum("effect", new CommandHardEnum("Effect", array_values(array_map(strval(...), StringToEffectParser::getInstance()->getKnownAliases()))), 0),
 				CommandParameter::standard("seconds", AvailableCommandsPacket::ARG_TYPE_INT, 0, true),
 				CommandParameter::standard("amplifier", AvailableCommandsPacket::ARG_TYPE_INT, 0, true),
-				CommandParameter::enum("hideParticles", new CommandHardEnum("Boolean", ["false, true"]), 0, true)
+				CommandParameter::enum("hideParticles", new CommandHardEnum("Boolean", ["false", "true"]), 0, true)
 			],
 			[
 				CommandParameter::standard("player", AvailableCommandsPacket::ARG_TYPE_TARGET),
