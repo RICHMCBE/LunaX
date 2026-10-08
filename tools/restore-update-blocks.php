@@ -75,7 +75,7 @@ function encodeRecoverySubChunk(string $header, array $layers) : string{
 	$result = $header;
 	$nbt = new LittleEndianNbtSerializer();
 	foreach($layers as [$blocks, $tags]){
-		$result .= chr($blocks->getBitsPerBlock() << 1) . $blocks->getWordArray();
+		$result .= chr(($blocks->getBitsPerBlock() << 1) & 0xff) . $blocks->getWordArray();
 		$palette = $blocks->getPalette();
 		if($blocks->getBitsPerBlock() !== 0){ $result .= pack('V', count($palette)); }
 		foreach($palette as $index){ $result .= $nbt->write(new TreeRoot($tags[$index])); }
@@ -83,7 +83,7 @@ function encodeRecoverySubChunk(string $header, array $layers) : string{
 	return $result;
 }
 
-if(count($argv) < 3){ throw new InvalidArgumentException('SOURCE_WORLD TARGET_WORLD [--apply] required'); }
+if(!isset($argv) || count($argv) < 3){ throw new InvalidArgumentException('SOURCE_WORLD TARGET_WORLD [--apply] required'); }
 $sourcePath = realpath($argv[1]);
 $targetPath = realpath($argv[2]);
 if($sourcePath === false || $targetPath === false || strcasecmp($sourcePath, $targetPath) === 0){
