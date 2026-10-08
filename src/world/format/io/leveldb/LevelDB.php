@@ -24,7 +24,9 @@ declare(strict_types=1);
 namespace pocketmine\world\format\io\leveldb;
 
 use pocketmine\block\Block;
+use pocketmine\block\PreservedBlockRegistry;
 use pocketmine\data\bedrock\BiomeIds;
+use pocketmine\data\bedrock\block\BlockStateData;
 use pocketmine\data\bedrock\block\BlockStateDeserializeException;
 use pocketmine\data\bedrock\block\convert\UnsupportedBlockStateException;
 use pocketmine\data\bedrock\WorldDataVersions;
@@ -202,7 +204,13 @@ class LevelDB extends BaseWorldProvider implements WritableWorldProvider{
 
 			//TODO: remember data for unknown states so we can implement them later
 			try{
-				$blockStateData = $this->blockDataUpgrader->upgradeBlockStateNbt($blockStateNbt);
+				// Legacy normalization can rewrite valid, currently unsupported states (e.g. mushroom faces).
+				// Only bypass it for exact canonical states at the current format version.
+				$preserved = null;
+				if($blockStateNbt->getInt('version', 0) === BlockStateData::CURRENT_VERSION){
+					$preserved = PreservedBlockRegistry::getInstance()->lookup(BlockStateData::fromNbt($blockStateNbt));
+				}
+				$blockStateData = $preserved?->getPreservedState() ?? $this->blockDataUpgrader->upgradeBlockStateNbt($blockStateNbt);
 			}catch(BlockStateDeserializeException $e){
 				//while not ideal, this is not a fatal error
 				$errorMessage = "Upgrade error: " . $e->getMessage() . ", NBT: " . $blockStateNbt->toString();
