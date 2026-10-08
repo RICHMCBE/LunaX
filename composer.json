@@ -92,6 +92,7 @@
       }
    },
    "scripts": {
+      "pre-autoload-dump": "@php build/apply-dependency-patches.php",
       "make-devtools": "@php -dphar.readonly=0 tests/plugins/DevTools/src/ConsoleScript.php --make ./ --relative tests/plugins/DevTools --out plugins/DevTools.phar",
       "make-server": [
          "@composer install --no-dev --classmap-authoritative --ignore-platform-reqs",
