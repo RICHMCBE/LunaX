@@ -72,7 +72,7 @@ final class RuntimeDataReader implements RuntimeDataDescriber{
 	}
 
 	private function readBoundedIntAuto(int $min, int $max) : int{
-		$bits = ((int) log($max - $min, 2)) + 1;
+		$bits = ($min === $max ? 1 : ((int) log($max - $min, 2)) + 1);
 		$result = $this->readInt($bits) + $min;
 		if($result < $min || $result > $max){
 			throw new InvalidSerializedRuntimeDataException("Value is outside the range $min - $max");
