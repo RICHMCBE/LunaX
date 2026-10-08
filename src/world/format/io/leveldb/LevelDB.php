@@ -310,7 +310,7 @@ class LevelDB extends BaseWorldProvider implements WritableWorldProvider{
 	 * @return PalettedBlockArray[]
 	 * @phpstan-return array<int, PalettedBlockArray>
 	 */
-	private static function deserialize3dBiomes(BinaryStream $stream, int $chunkVersion, \Logger $logger) : array{
+	private static function deserialize3dBiomes(BinaryStream $stream, int $chunkVersion) : array{
 		$previous = null;
 		$result = [];
 		$nextIndex = Chunk::MIN_SUBCHUNK_INDEX;
@@ -331,17 +331,12 @@ class LevelDB extends BaseWorldProvider implements WritableWorldProvider{
 				if($nextIndex <= Chunk::MAX_SUBCHUNK_INDEX){ //older versions wrote additional superfluous biome palettes
 					$result[$nextIndex++] = $decoded;
 				}elseif($stream->feof()){
-					//not enough padding biome arrays for the given version - this is non-critical since we discard the excess anyway, but this should be logged
-					$logger->error("Wrong number of 3D biome palettes for this chunk version: expected $expectedCount, but got " . ($i + 1) . " - this is not a problem, but may indicate a corrupted chunk");
+					//Missing padding arrays are non-critical because excess biome palettes are discarded.
 					break;
 				}
 			}catch(BinaryDataException $e){
 				throw new CorruptedChunkException("Failed to deserialize biome palette $i: " . $e->getMessage(), 0, $e);
 			}
-		}
-		if(!$stream->feof()){
-			//maybe bad output produced by a third-party conversion tool like Chunker
-			$logger->error("Unexpected trailing data after 3D biomes data");
 		}
 
 		return $result;
@@ -637,7 +632,7 @@ class LevelDB extends BaseWorldProvider implements WritableWorldProvider{
 
 			try{
 				$binaryStream->get(512);
-				$biomeArrays = self::deserialize3dBiomes($binaryStream, $chunkVersion, $logger);
+				$biomeArrays = self::deserialize3dBiomes($binaryStream, $chunkVersion);
 			}catch(BinaryDataException $e){
 				throw new CorruptedChunkException($e->getMessage(), 0, $e);
 			}
