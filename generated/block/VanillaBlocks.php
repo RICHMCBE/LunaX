@@ -137,6 +137,7 @@ final class VanillaBlocks{
 	private static Wall $_mBRICK_WALL;
 	private static BrownMushroom $_mBROWN_MUSHROOM;
 	private static BrownMushroomBlock $_mBROWN_MUSHROOM_BLOCK;
+	private static BubbleColumn $_mBUBBLE_COLUMN;
 	private static BuddingAmethyst $_mBUDDING_AMETHYST;
 	private static Cactus $_mCACTUS;
 	private static CactusFlower $_mCACTUS_FLOWER;
@@ -212,6 +213,8 @@ final class VanillaBlocks{
 	private static ChemistryTable $_mCOMPOUND_CREATOR;
 	private static Concrete $_mCONCRETE;
 	private static ConcretePowder $_mCONCRETE_POWDER;
+	private static ConcreteSlab $_mCONCRETE_SLAB;
+	private static ConcreteStair $_mCONCRETE_STAIRS;
 	private static ContinuousPotentSulfur $_mCONTINUOUS_POTENT_SULFUR;
 	private static Copper $_mCOPPER;
 	private static CopperBars $_mCOPPER_BARS;
@@ -314,6 +317,7 @@ final class VanillaBlocks{
 	private static DoubleTallGrass $_mDOUBLE_TALLGRASS;
 	private static DragonEgg $_mDRAGON_EGG;
 	private static DriedKelp $_mDRIED_KELP;
+	private static Dropper $_mDROPPER;
 	private static DyedCandle $_mDYED_CANDLE;
 	private static DyedShulkerBox $_mDYED_SHULKER_BOX;
 	private static Element $_mELEMENT_ACTINIUM;
@@ -528,6 +532,7 @@ final class VanillaBlocks{
 	private static DoubleTallGrass $_mLARGE_FERN;
 	private static Lava $_mLAVA;
 	private static LavaCauldron $_mLAVA_CAULDRON;
+	private static LeafLitter $_mLEAF_LITTER;
 	private static Lectern $_mLECTERN;
 	private static Opaque $_mLEGACY_STONECUTTER;
 	private static Lever $_mLEVER;
@@ -677,6 +682,22 @@ final class VanillaBlocks{
 	private static Slab $_mPOLISHED_TUFF_SLAB;
 	private static Stair $_mPOLISHED_TUFF_STAIRS;
 	private static Wall $_mPOLISHED_TUFF_WALL;
+	private static WoodenButton $_mPOPLAR_BUTTON;
+	private static CeilingCenterHangingSign $_mPOPLAR_CEILING_CENTER_HANGING_SIGN;
+	private static CeilingEdgesHangingSign $_mPOPLAR_CEILING_EDGES_HANGING_SIGN;
+	private static WoodenDoor $_mPOPLAR_DOOR;
+	private static WoodenFence $_mPOPLAR_FENCE;
+	private static FenceGate $_mPOPLAR_FENCE_GATE;
+	private static Wood $_mPOPLAR_LOG;
+	private static Planks $_mPOPLAR_PLANKS;
+	private static WoodenPressurePlate $_mPOPLAR_PRESSURE_PLATE;
+	private static FloorSign $_mPOPLAR_SIGN;
+	private static WoodenSlab $_mPOPLAR_SLAB;
+	private static WoodenStairs $_mPOPLAR_STAIRS;
+	private static WoodenTrapdoor $_mPOPLAR_TRAPDOOR;
+	private static WallHangingSign $_mPOPLAR_WALL_HANGING_SIGN;
+	private static WallSign $_mPOPLAR_WALL_SIGN;
+	private static Wood $_mPOPLAR_WOOD;
 	private static Flower $_mPOPPY;
 	private static Potato $_mPOTATOES;
 	private static PotentSulfur $_mPOTENT_SULFUR;
@@ -868,6 +889,8 @@ final class VanillaBlocks{
 	private static Flower $_mWHITE_TULIP;
 	private static WitherRose $_mWITHER_ROSE;
 	private static Wool $_mWOOL;
+	private static WoolSlab $_mWOOL_SLAB;
+	private static WoolStair $_mWOOL_STAIRS;
 
 	/**
 	 * @var Block[]
@@ -1001,6 +1024,7 @@ final class VanillaBlocks{
 			"brick_wall" => fn(Wall $v) => self::$_mBRICK_WALL = $v,
 			"brown_mushroom" => fn(BrownMushroom $v) => self::$_mBROWN_MUSHROOM = $v,
 			"brown_mushroom_block" => fn(BrownMushroomBlock $v) => self::$_mBROWN_MUSHROOM_BLOCK = $v,
+			"bubble_column" => fn(BubbleColumn $v) => self::$_mBUBBLE_COLUMN = $v,
 			"budding_amethyst" => fn(BuddingAmethyst $v) => self::$_mBUDDING_AMETHYST = $v,
 			"cactus" => fn(Cactus $v) => self::$_mCACTUS = $v,
 			"cactus_flower" => fn(CactusFlower $v) => self::$_mCACTUS_FLOWER = $v,
@@ -1076,6 +1100,8 @@ final class VanillaBlocks{
 			"compound_creator" => fn(ChemistryTable $v) => self::$_mCOMPOUND_CREATOR = $v,
 			"concrete" => fn(Concrete $v) => self::$_mCONCRETE = $v,
 			"concrete_powder" => fn(ConcretePowder $v) => self::$_mCONCRETE_POWDER = $v,
+			"concrete_slab" => fn(ConcreteSlab $v) => self::$_mCONCRETE_SLAB = $v,
+			"concrete_stairs" => fn(ConcreteStair $v) => self::$_mCONCRETE_STAIRS = $v,
 			"continuous_potent_sulfur" => fn(ContinuousPotentSulfur $v) => self::$_mCONTINUOUS_POTENT_SULFUR = $v,
 			"copper" => fn(Copper $v) => self::$_mCOPPER = $v,
 			"copper_bars" => fn(CopperBars $v) => self::$_mCOPPER_BARS = $v,
@@ -1178,6 +1204,7 @@ final class VanillaBlocks{
 			"double_tallgrass" => fn(DoubleTallGrass $v) => self::$_mDOUBLE_TALLGRASS = $v,
 			"dragon_egg" => fn(DragonEgg $v) => self::$_mDRAGON_EGG = $v,
 			"dried_kelp" => fn(DriedKelp $v) => self::$_mDRIED_KELP = $v,
+			"dropper" => fn(Dropper $v) => self::$_mDROPPER = $v,
 			"dyed_candle" => fn(DyedCandle $v) => self::$_mDYED_CANDLE = $v,
 			"dyed_shulker_box" => fn(DyedShulkerBox $v) => self::$_mDYED_SHULKER_BOX = $v,
 			"element_actinium" => fn(Element $v) => self::$_mELEMENT_ACTINIUM = $v,
@@ -1392,6 +1419,7 @@ final class VanillaBlocks{
 			"large_fern" => fn(DoubleTallGrass $v) => self::$_mLARGE_FERN = $v,
 			"lava" => fn(Lava $v) => self::$_mLAVA = $v,
 			"lava_cauldron" => fn(LavaCauldron $v) => self::$_mLAVA_CAULDRON = $v,
+			"leaf_litter" => fn(LeafLitter $v) => self::$_mLEAF_LITTER = $v,
 			"lectern" => fn(Lectern $v) => self::$_mLECTERN = $v,
 			"legacy_stonecutter" => fn(Opaque $v) => self::$_mLEGACY_STONECUTTER = $v,
 			"lever" => fn(Lever $v) => self::$_mLEVER = $v,
@@ -1541,6 +1569,22 @@ final class VanillaBlocks{
 			"polished_tuff_slab" => fn(Slab $v) => self::$_mPOLISHED_TUFF_SLAB = $v,
 			"polished_tuff_stairs" => fn(Stair $v) => self::$_mPOLISHED_TUFF_STAIRS = $v,
 			"polished_tuff_wall" => fn(Wall $v) => self::$_mPOLISHED_TUFF_WALL = $v,
+			"poplar_button" => fn(WoodenButton $v) => self::$_mPOPLAR_BUTTON = $v,
+			"poplar_ceiling_center_hanging_sign" => fn(CeilingCenterHangingSign $v) => self::$_mPOPLAR_CEILING_CENTER_HANGING_SIGN = $v,
+			"poplar_ceiling_edges_hanging_sign" => fn(CeilingEdgesHangingSign $v) => self::$_mPOPLAR_CEILING_EDGES_HANGING_SIGN = $v,
+			"poplar_door" => fn(WoodenDoor $v) => self::$_mPOPLAR_DOOR = $v,
+			"poplar_fence" => fn(WoodenFence $v) => self::$_mPOPLAR_FENCE = $v,
+			"poplar_fence_gate" => fn(FenceGate $v) => self::$_mPOPLAR_FENCE_GATE = $v,
+			"poplar_log" => fn(Wood $v) => self::$_mPOPLAR_LOG = $v,
+			"poplar_planks" => fn(Planks $v) => self::$_mPOPLAR_PLANKS = $v,
+			"poplar_pressure_plate" => fn(WoodenPressurePlate $v) => self::$_mPOPLAR_PRESSURE_PLATE = $v,
+			"poplar_sign" => fn(FloorSign $v) => self::$_mPOPLAR_SIGN = $v,
+			"poplar_slab" => fn(WoodenSlab $v) => self::$_mPOPLAR_SLAB = $v,
+			"poplar_stairs" => fn(WoodenStairs $v) => self::$_mPOPLAR_STAIRS = $v,
+			"poplar_trapdoor" => fn(WoodenTrapdoor $v) => self::$_mPOPLAR_TRAPDOOR = $v,
+			"poplar_wall_hanging_sign" => fn(WallHangingSign $v) => self::$_mPOPLAR_WALL_HANGING_SIGN = $v,
+			"poplar_wall_sign" => fn(WallSign $v) => self::$_mPOPLAR_WALL_SIGN = $v,
+			"poplar_wood" => fn(Wood $v) => self::$_mPOPLAR_WOOD = $v,
 			"poppy" => fn(Flower $v) => self::$_mPOPPY = $v,
 			"potatoes" => fn(Potato $v) => self::$_mPOTATOES = $v,
 			"potent_sulfur" => fn(PotentSulfur $v) => self::$_mPOTENT_SULFUR = $v,
@@ -1732,6 +1776,8 @@ final class VanillaBlocks{
 			"white_tulip" => fn(Flower $v) => self::$_mWHITE_TULIP = $v,
 			"wither_rose" => fn(WitherRose $v) => self::$_mWITHER_ROSE = $v,
 			"wool" => fn(Wool $v) => self::$_mWOOL = $v,
+			"wool_slab" => fn(WoolSlab $v) => self::$_mWOOL_SLAB = $v,
+			"wool_stairs" => fn(WoolStair $v) => self::$_mWOOL_STAIRS = $v,
 		];
 	}
 
@@ -2265,6 +2311,11 @@ final class VanillaBlocks{
 		return clone self::$_mBROWN_MUSHROOM_BLOCK;
 	}
 
+	public static function BUBBLE_COLUMN() : BubbleColumn{
+		if(!isset(self::$_mBUBBLE_COLUMN)){ self::init(); }
+		return clone self::$_mBUBBLE_COLUMN;
+	}
+
 	public static function BUDDING_AMETHYST() : BuddingAmethyst{
 		if(!isset(self::$_mBUDDING_AMETHYST)){ self::init(); }
 		return clone self::$_mBUDDING_AMETHYST;
@@ -2638,6 +2689,16 @@ final class VanillaBlocks{
 	public static function CONCRETE_POWDER() : ConcretePowder{
 		if(!isset(self::$_mCONCRETE_POWDER)){ self::init(); }
 		return clone self::$_mCONCRETE_POWDER;
+	}
+
+	public static function CONCRETE_SLAB() : ConcreteSlab{
+		if(!isset(self::$_mCONCRETE_SLAB)){ self::init(); }
+		return clone self::$_mCONCRETE_SLAB;
+	}
+
+	public static function CONCRETE_STAIRS() : ConcreteStair{
+		if(!isset(self::$_mCONCRETE_STAIRS)){ self::init(); }
+		return clone self::$_mCONCRETE_STAIRS;
 	}
 
 	public static function CONTINUOUS_POTENT_SULFUR() : ContinuousPotentSulfur{
@@ -3148,6 +3209,11 @@ final class VanillaBlocks{
 	public static function DRIED_KELP() : DriedKelp{
 		if(!isset(self::$_mDRIED_KELP)){ self::init(); }
 		return clone self::$_mDRIED_KELP;
+	}
+
+	public static function DROPPER() : Dropper{
+		if(!isset(self::$_mDROPPER)){ self::init(); }
+		return clone self::$_mDROPPER;
 	}
 
 	public static function DYED_CANDLE() : DyedCandle{
@@ -4220,6 +4286,11 @@ final class VanillaBlocks{
 		return clone self::$_mLAVA_CAULDRON;
 	}
 
+	public static function LEAF_LITTER() : LeafLitter{
+		if(!isset(self::$_mLEAF_LITTER)){ self::init(); }
+		return clone self::$_mLEAF_LITTER;
+	}
+
 	public static function LECTERN() : Lectern{
 		if(!isset(self::$_mLECTERN)){ self::init(); }
 		return clone self::$_mLECTERN;
@@ -4963,6 +5034,86 @@ final class VanillaBlocks{
 	public static function POLISHED_TUFF_WALL() : Wall{
 		if(!isset(self::$_mPOLISHED_TUFF_WALL)){ self::init(); }
 		return clone self::$_mPOLISHED_TUFF_WALL;
+	}
+
+	public static function POPLAR_BUTTON() : WoodenButton{
+		if(!isset(self::$_mPOPLAR_BUTTON)){ self::init(); }
+		return clone self::$_mPOPLAR_BUTTON;
+	}
+
+	public static function POPLAR_CEILING_CENTER_HANGING_SIGN() : CeilingCenterHangingSign{
+		if(!isset(self::$_mPOPLAR_CEILING_CENTER_HANGING_SIGN)){ self::init(); }
+		return clone self::$_mPOPLAR_CEILING_CENTER_HANGING_SIGN;
+	}
+
+	public static function POPLAR_CEILING_EDGES_HANGING_SIGN() : CeilingEdgesHangingSign{
+		if(!isset(self::$_mPOPLAR_CEILING_EDGES_HANGING_SIGN)){ self::init(); }
+		return clone self::$_mPOPLAR_CEILING_EDGES_HANGING_SIGN;
+	}
+
+	public static function POPLAR_DOOR() : WoodenDoor{
+		if(!isset(self::$_mPOPLAR_DOOR)){ self::init(); }
+		return clone self::$_mPOPLAR_DOOR;
+	}
+
+	public static function POPLAR_FENCE() : WoodenFence{
+		if(!isset(self::$_mPOPLAR_FENCE)){ self::init(); }
+		return clone self::$_mPOPLAR_FENCE;
+	}
+
+	public static function POPLAR_FENCE_GATE() : FenceGate{
+		if(!isset(self::$_mPOPLAR_FENCE_GATE)){ self::init(); }
+		return clone self::$_mPOPLAR_FENCE_GATE;
+	}
+
+	public static function POPLAR_LOG() : Wood{
+		if(!isset(self::$_mPOPLAR_LOG)){ self::init(); }
+		return clone self::$_mPOPLAR_LOG;
+	}
+
+	public static function POPLAR_PLANKS() : Planks{
+		if(!isset(self::$_mPOPLAR_PLANKS)){ self::init(); }
+		return clone self::$_mPOPLAR_PLANKS;
+	}
+
+	public static function POPLAR_PRESSURE_PLATE() : WoodenPressurePlate{
+		if(!isset(self::$_mPOPLAR_PRESSURE_PLATE)){ self::init(); }
+		return clone self::$_mPOPLAR_PRESSURE_PLATE;
+	}
+
+	public static function POPLAR_SIGN() : FloorSign{
+		if(!isset(self::$_mPOPLAR_SIGN)){ self::init(); }
+		return clone self::$_mPOPLAR_SIGN;
+	}
+
+	public static function POPLAR_SLAB() : WoodenSlab{
+		if(!isset(self::$_mPOPLAR_SLAB)){ self::init(); }
+		return clone self::$_mPOPLAR_SLAB;
+	}
+
+	public static function POPLAR_STAIRS() : WoodenStairs{
+		if(!isset(self::$_mPOPLAR_STAIRS)){ self::init(); }
+		return clone self::$_mPOPLAR_STAIRS;
+	}
+
+	public static function POPLAR_TRAPDOOR() : WoodenTrapdoor{
+		if(!isset(self::$_mPOPLAR_TRAPDOOR)){ self::init(); }
+		return clone self::$_mPOPLAR_TRAPDOOR;
+	}
+
+	public static function POPLAR_WALL_HANGING_SIGN() : WallHangingSign{
+		if(!isset(self::$_mPOPLAR_WALL_HANGING_SIGN)){ self::init(); }
+		return clone self::$_mPOPLAR_WALL_HANGING_SIGN;
+	}
+
+	public static function POPLAR_WALL_SIGN() : WallSign{
+		if(!isset(self::$_mPOPLAR_WALL_SIGN)){ self::init(); }
+		return clone self::$_mPOPLAR_WALL_SIGN;
+	}
+
+	public static function POPLAR_WOOD() : Wood{
+		if(!isset(self::$_mPOPLAR_WOOD)){ self::init(); }
+		return clone self::$_mPOPLAR_WOOD;
 	}
 
 	public static function POPPY() : Flower{
@@ -5918,5 +6069,15 @@ final class VanillaBlocks{
 	public static function WOOL() : Wool{
 		if(!isset(self::$_mWOOL)){ self::init(); }
 		return clone self::$_mWOOL;
+	}
+
+	public static function WOOL_SLAB() : WoolSlab{
+		if(!isset(self::$_mWOOL_SLAB)){ self::init(); }
+		return clone self::$_mWOOL_SLAB;
+	}
+
+	public static function WOOL_STAIRS() : WoolStair{
+		if(!isset(self::$_mWOOL_STAIRS)){ self::init(); }
+		return clone self::$_mWOOL_STAIRS;
 	}
 }
