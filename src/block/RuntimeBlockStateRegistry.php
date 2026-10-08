@@ -91,6 +91,9 @@ class RuntimeBlockStateRegistry{
 		foreach(VanillaBlocks::getAll() as $block){
 			$this->register($block);
 		}
+		foreach(PreservedBlockRegistry::getInstance()->getBlocks() as $block){
+			$this->register($block);
+		}
 	}
 
 	/**
