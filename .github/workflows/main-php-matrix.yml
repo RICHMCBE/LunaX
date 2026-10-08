@@ -82,7 +82,7 @@ jobs:
         run: composer install --prefer-dist --no-interaction
 
       - name: Run PHPUnit tests
-        run: ./vendor/bin/phpunit --bootstrap vendor/autoload.php --fail-on-warning tests/phpunit
+        run: ./vendor/bin/phpunit --bootstrap vendor/autoload.php --fail-on-warning --display-warnings tests/phpunit
 
   integration:
     name: Integration tests
