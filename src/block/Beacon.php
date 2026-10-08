@@ -146,7 +146,7 @@ final class Beacon extends Transparent{
 
 			$world = $this->position->getWorld();
 			$aabb = $this->getCollisionBoxes()[0]->expandedCopy($radius, $radius, $radius)->addCoord(0, $world->getMaxY(), 0);
-			if($this->primaryEffect?->getName() === $this->secondaryEffect?->getName()){
+			if($this->primaryEffect->getName() === $this->secondaryEffect?->getName()){
 				foreach($world->getNearbyEntities($aabb) as $entity){
 					if($entity instanceof Player){
 						$entity->getEffects()->add(new EffectInstance($this->primaryEffect, $effectDuration * 20, 1));
