@@ -67,7 +67,7 @@ abstract class Command{
 
 	protected Translatable|string $usageMessage;
 
-	/** @var CommandParameter[] */
+	/** @var CommandParameter[][] */
 	private array $overloads = [];
 
 	/** @var string[] */
@@ -75,7 +75,8 @@ abstract class Command{
 	private ?string $permissionMessage = null;
 
 	/**
-	 * @param string[] $aliases
+	 * @param string[]             $aliases
+	 * @param CommandParameter[][] $overloads
 	 * @phpstan-param list<string> $aliases
 	 */
 	public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = [], array $overloads = []){
@@ -84,7 +85,7 @@ abstract class Command{
 		$this->setDescription($description);
 		$this->usageMessage = $usageMessage ?? ("/" . $name);
 		$this->setAliases($aliases);
-		$this->overloads = (!empty($overloads)) ? $overloads : [[CommandParameter::standard("args", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, 0, true)]];
+		$this->overloads = ($overloads !== []) ? $overloads : [[CommandParameter::standard("args", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, 0, true)]];
 	}
 
 	/**
@@ -218,8 +219,7 @@ abstract class Command{
 	}
 
 	/**
-	 * @param int $index
-	 * @return CommandParameter[]|null
+	 * @return CommandParameter[][]
 	 */
 	public function getOverloads() : array{
 		return $this->overloads;
@@ -249,6 +249,7 @@ abstract class Command{
 		$this->usageMessage = $usage;
 	}
 
+	/** @param CommandParameter[][] $parameters */
 	public function setOverloads(array $parameters = []) : void{
 		$this->overloads = array_values($parameters);
 	}
@@ -271,11 +272,13 @@ abstract class Command{
 		}
 	}
 
+	/** @return array<int, \pocketmine\entity\Entity>|array{0: string}|null */
 	public function getTargetConverter(CommandSender $sender, string $targetArg = "") : ?array{
 		$converter = new ParameterDataConverter($sender, $targetArg);
 		return $converter->getTargetConverter();
 	}
 
+	/** @return \pocketmine\player\Player[]|null */
 	public function getPlayerTargetConverter(CommandSender $sender, string $targetArg = "") : ?array{
 		$converter = new ParameterDataConverter($sender, $targetArg);
 		return $converter->getPlayerTargetConverter();
