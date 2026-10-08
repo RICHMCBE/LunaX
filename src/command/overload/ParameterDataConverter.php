@@ -40,6 +40,7 @@ use function explode;
 use function fmod;
 use function in_array;
 use function is_array;
+use function is_object;
 use function is_string;
 use function method_exists;
 use function preg_match;
@@ -116,7 +117,7 @@ class ParameterDataConverter{
 	 */
 	private function parseSelector() : ?array{
 		$selector = trim($this->targetArg);
-		if(!preg_match('/^@([a-zA-Z])(?:\[(.*)])?$/s', $selector, $matches)){
+		if(preg_match('/^@([a-zA-Z])(?:\[(.*)])?$/s', $selector, $matches) !== 1){
 			return null;
 		}
 
@@ -399,6 +400,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param list<array{negated: bool, value: string}> $entries
+	 * @param (callable(string): string)|null           $normalizer
 	 */
 	private function matchesOrExcludeList(array $entries, string $actual, ?callable $normalizer = null) : bool{
 		$positives = [];
@@ -423,6 +425,7 @@ class ParameterDataConverter{
 		return true;
 	}
 
+	/** @return (callable(Entity): bool)|null */
 	private function makeWorldPredicate(?World $world) : ?callable{
 		if($world === null){
 			return null;
@@ -434,6 +437,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, string> $single
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeVolumePredicate(array $single, Vector3 $origin) : ?callable{
 		if(!isset($single['dx']) && !isset($single['dy']) && !isset($single['dz'])){
@@ -466,6 +470,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, string> $single
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeRadiusPredicate(array $single, Vector3 $origin) : ?callable{
 		if(!isset($single['r']) && !isset($single['rm'])){
@@ -488,6 +493,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, string> $single
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeRotationPredicate(array $single) : ?callable{
 		if(!isset($single['rx']) && !isset($single['rxm']) && !isset($single['ry']) && !isset($single['rym'])){
@@ -528,6 +534,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, string> $single
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeLevelPredicate(array $single) : ?callable{
 		if(!isset($single['l']) && !isset($single['lm'])){
@@ -553,6 +560,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, list<array{negated: bool, value: string}>> $filters
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeGameModePredicate(array $filters) : ?callable{
 		if(!isset($filters['m'])){
@@ -588,6 +596,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, list<array{negated: bool, value: string}>> $filters
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeNamePredicate(array $filters) : ?callable{
 		if(!isset($filters['name'])){
@@ -603,6 +612,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, list<array{negated: bool, value: string}>> $filters
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeTypePredicate(array $filters) : ?callable{
 		if(!isset($filters['type'])){
@@ -619,11 +629,7 @@ class ParameterDataConverter{
 		if($e instanceof Player){
 			return 'minecraft:player';
 		}
-		if(method_exists($e, 'getNetworkTypeId')){
-			return $this->normalizeTypeId($e->getNetworkTypeId());
-		}
-		$short = (new \ReflectionClass($e))->getShortName();
-		return $this->normalizeTypeId($short);
+		return $this->normalizeTypeId($e::getNetworkTypeId());
 	}
 
 	private function normalizeTypeId(string $id) : string{
@@ -636,6 +642,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, list<array{negated: bool, value: string}>> $filters
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeFamilyPredicate(array $filters) : ?callable{
 		if(!isset($filters['family'])){
@@ -691,6 +698,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, list<array{negated: bool, value: string}>> $filters
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeTagPredicate(array $filters) : ?callable{
 		if(!isset($filters['tag'])){
@@ -740,11 +748,12 @@ class ParameterDataConverter{
 			return $e->getSelectorTags();
 		}
 		$tag = $e->getScoreTag();
-		return $tag !== "" ? [$tag] : [];
+		return $tag !== null && $tag !== "" ? [$tag] : [];
 	}
 
 	/**
 	 * @param array<string, string> $braces
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeScoresPredicate(array $braces) : ?callable{
 		if(!isset($braces['scores']) || trim($braces['scores']) === ''){
@@ -759,7 +768,7 @@ class ParameterDataConverter{
 			if(!method_exists($e, 'getSelectorScore')){
 				return false;
 			}
-			foreach($ranges as $objective => $range){
+			foreach(\pocketmine\utils\Utils::stringifyKeys($ranges) as $objective => $range){
 				$score = $e->getSelectorScore($objective);
 				if($score === null || !$this->rangeContains($range, (float) $score)){
 					return false;
@@ -771,6 +780,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, string> $braces
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeHasPermissionPredicate(array $braces) : ?callable{
 		if(!isset($braces['haspermission']) || trim($braces['haspermission']) === ''){
@@ -794,6 +804,7 @@ class ParameterDataConverter{
 
 	/**
 	 * @param array<string, string> $braces
+	 * @return (callable(Entity): bool)|null
 	 */
 	private function makeHasItemPredicate(array $braces) : ?callable{
 		if(!isset($braces['hasitem']) || trim($braces['hasitem']) === ''){
@@ -829,6 +840,9 @@ class ParameterDataConverter{
 	}
 
 	private function matchesItemIdentifier(mixed $item, string $wantedNormalized) : bool{
+		if(!is_object($item)){
+			return false;
+		}
 		if(method_exists($item, 'getVanillaName')){
 			return $this->normalizeTypeId((string) $item->getVanillaName()) === $wantedNormalized;
 		}
@@ -839,7 +853,7 @@ class ParameterDataConverter{
 	}
 
 	/**
-	 * @param Entity[] $candidates
+	 * @param Entity[]              $candidates
 	 * @param array<string, string> $single
 	 * @return Entity[]
 	 */
