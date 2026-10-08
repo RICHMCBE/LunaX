@@ -1,0 +1,48 @@
+diff --git a/level_sound_id_map.json b/level_sound_id_map.json
+index 038104a..b7232e2 100644
+--- a/level_sound_id_map.json
++++ b/level_sound_id_map.json
+@@ -266,6 +266,7 @@
+     "hurt.in.water": 18,
+     "hurt.reduced": 508,
+     "hurt.screamer": 349,
++    "ice_ball.break": 614,
+     "icebomb.hit": 189,
+     "ignite": 50,
+     "imitate.blaze": 145,
+@@ -552,6 +553,7 @@
+     "ui.cartography_table.take_result": 275,
+     "ui.loom.take_result": 277,
+     "ui.stonecutter.take_result": 276,
++    "undefined": 615,
+     "unfect": 61,
+     "unfreeze": 541,
+     "unsaddle": 560,
+diff --git a/protocol_info.json b/protocol_info.json
+index c754909..1fc90ae 100644
+--- a/protocol_info.json
++++ b/protocol_info.json
+@@ -3,9 +3,9 @@
+         "major": 1,
+         "minor": 26,
+         "patch": 60,
+-        "revision": 25,
++        "revision": 30,
+         "beta": true,
+-        "protocol_version": 2211
++        "protocol_version": 2225
+     },
+     "packets": {
+         "LoginPacket": 1,
+@@ -242,6 +242,10 @@
+         "ClientboundMatchmakingStatePacket": 353,
+         "ServerboundStonecutterSetRecipePacket": 354,
+         "ClientboundStonecutterSetRecipePacket": 355,
+-        "ServerboundMatchmakingCancelPacket": 356
++        "ServerboundMatchmakingCancelPacket": 356,
++        "SetPassengerOfBlockPacket": 357,
++        "ServerboundCursorItemDragPacket": 358,
++        "ClientboundPlayAudioContentPacket": 359,
++        "ServerboundRegisterAudioContentPacket": 360
+     }
+ }
