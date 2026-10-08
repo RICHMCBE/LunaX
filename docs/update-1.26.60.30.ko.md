@@ -25,6 +25,8 @@
 
 병합 전 구현 검사에서 LunaX PHPUnit 210개, BedrockProtocol PHPUnit 491개 및 각각의 PHPStan 검사가 통과했습니다. 별도 LevelDB 저장·닫기·재열기 검사에서는 보존 전용 1,464개 상태가 일치했습니다. 공급기 창과 실제 전원 작동, 교육용 블록 설치·파괴의 최종 클라이언트 확인은 남아 있습니다.
 
+stable 병합 후 코드 재생성과 PHPUnit 210개(검증 154,738회)는 통과했습니다. PHPStan은 stable에서 유지한 명령어·신호기·스킨 코드의 타입 선언 등 36개 오류로 실패했습니다. 따라서 병합본의 정적 분석 통과를 의미하지 않습니다. 기존 stable의 명령어 오버로드와 신호기 기능, LunaX 버전 1.4.0은 유지했습니다.
+
 현재 Composer의 공개 의존성 고정값은 이전 프리뷰를 가리킵니다. 이 저장소만 내려받아 일반 `composer install`을 실행하는 것으로는 테스트한 프리뷰 환경이 재현되지 않습니다. 별도 로컬 `TeamSelenyx-BedrockProtocol`과 `TeamSelenyx-BedrockData` 변경을 준비하고 `tools/install-preview-dependencies.ps1`을 사용해야 합니다. 두 의존성의 공개 및 버전 고정, 공식 .30 팔레트 재추출, 인벤토리·제작·대표 게임 동작 검증이 완료되기 전에는 정식 지원 완료로 취급하지 않습니다.
 
 세부 근거와 기존 검증 기록은 [프리뷰 개발 기록](bedrock-1.26.60-preview-prep.md)에 있습니다. 기존 PHAR 파일은 이번 소스 변경으로 자동 갱신되지 않습니다.
