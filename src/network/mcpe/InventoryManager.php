@@ -389,6 +389,7 @@ class InventoryManager{
 				$inv instanceof BrewingStandInventory => WindowTypes::BREWING_STAND,
 				$inv instanceof AnvilInventory => WindowTypes::ANVIL,
 				$inv instanceof HopperInventory => WindowTypes::HOPPER,
+				$inv instanceof \pocketmine\block\inventory\DropperInventory => WindowTypes::DROPPER,
 				$inv instanceof CraftingTableInventory => WindowTypes::WORKBENCH,
 				$inv instanceof StonecutterInventory => WindowTypes::STONECUTTER,
 				$inv instanceof CartographyTableInventory => WindowTypes::CARTOGRAPHY,
