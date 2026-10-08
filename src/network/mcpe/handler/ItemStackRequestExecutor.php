@@ -350,7 +350,7 @@ class ItemStackRequestExecutor{
 			}
 			$secondaryEffect = $effectMap->fromId($action->getSecondaryEffectId());
 			$this->builder->addAction(new BeaconPaymentAction($window, $primaryEffect, $secondaryEffect));
-			
+
 		}elseif($action instanceof CreativeCreateStackRequestAction){
 			$item = $this->player->getCreativeInventory()->getItem($action->getCreativeItemId());
 			if($item === null){
