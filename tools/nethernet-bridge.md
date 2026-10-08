@@ -20,4 +20,6 @@ Python sidecar over framed TCP. The sidecar handles HTTP signaling and WebRTC.
 
 The sidecar creates `nethernet-operator-key.pem` in its working directory.
 Keep this private key out of the repository. The current sidecar is for
-1.26.60 preview testing and advertises protocol 2211.
+1.26.60.30 preview testing and advertises protocol 2225. Install the matching
+local dependencies with `tools/install-preview-dependencies.ps1` before running
+the source server. The published dependency pins still target the older preview.
