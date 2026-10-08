@@ -30,6 +30,8 @@ use pocketmine\nbt\tag\Tag;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\utils\Utils;
 use function count;
+use function hash;
+use function hexdec;
 use function ksort;
 use const SORT_STRING;
 
@@ -68,6 +70,22 @@ final class BlockStateDictionaryEntry{
 	}
 
 	public function getMeta() : int{ return $this->meta; }
+
+	/** Bedrock hashes little-endian NBT containing name and sorted states, without version. */
+	public function getNetworkId() : int{
+		if($this->stateName === "minecraft:unknown"){
+			return -2;
+		}
+		$states = CompoundTag::create();
+		foreach(Utils::stringifyKeys(self::decodeStateProperties($this->rawStateProperties)) as $name => $value){
+			$states->setTag($name, $value);
+		}
+		$tag = CompoundTag::create()
+			->setString("name", $this->stateName)
+			->setTag("states", $states);
+		$hash = (int) hexdec(hash("fnv1a32", (new LittleEndianNbtSerializer())->write(new TreeRoot($tag))));
+		return $hash >= 0x80000000 ? $hash - 0x100000000 : $hash;
+	}
 
 	/**
 	 * @return Tag[]
