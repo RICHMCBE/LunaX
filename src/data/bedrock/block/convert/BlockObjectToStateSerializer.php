@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\data\bedrock\block\convert;
 
 use pocketmine\block\Block;
+use pocketmine\block\PreservedBlock;
 use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\Slab;
 use pocketmine\block\Stair;
@@ -110,6 +111,9 @@ final class BlockObjectToStateSerializer implements BlockStateSerializer{
 	 * @throws BlockStateSerializeException
 	 */
 	public function serializeBlock(Block $blockState) : BlockStateData{
+		if($blockState instanceof PreservedBlock){
+			return $blockState->getPreservedState();
+		}
 		$typeId = $blockState->getTypeId();
 
 		$locatedSerializer = $this->serializers[$typeId] ?? null;

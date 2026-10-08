@@ -25,11 +25,20 @@ namespace pocketmine\block;
 
 use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityExtinguishEvent;
+use pocketmine\math\Facing;
 use pocketmine\world\sound\BucketEmptyWaterSound;
 use pocketmine\world\sound\BucketFillWaterSound;
 use pocketmine\world\sound\Sound;
 
 class Water extends Liquid{
+	public function onScheduledUpdate() : void{
+		$drag = $this->isSource() ? BubbleColumn::getDragFromSupport($this->getSide(Facing::DOWN)) : null;
+		if($drag !== null){
+			$this->position->getWorld()->setBlock($this->position, VanillaBlocks::BUBBLE_COLUMN()->setDraggingDown($drag));
+			return;
+		}
+		parent::onScheduledUpdate();
+	}
 
 	public function getLightFilter() : int{
 		return 2;

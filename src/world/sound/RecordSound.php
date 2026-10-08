@@ -25,10 +25,10 @@ namespace pocketmine\world\sound;
 
 use pocketmine\block\utils\RecordType;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 use pocketmine\network\mcpe\protocol\RecordStartedPacket;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
+use pocketmine\network\mcpe\protocol\types\LevelSoundEvent;
 
 class RecordSound implements Sound{
 	public function __construct(

@@ -58,6 +58,7 @@ use pocketmine\network\mcpe\compression\ZlibCompressor;
 use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\encryption\EncryptionContext;
 use pocketmine\network\mcpe\EntityEventBroadcaster;
+use pocketmine\network\mcpe\nethernet\NetherNetInterface;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\PacketBroadcaster;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
@@ -1071,7 +1072,7 @@ class Server{
 			$this->worldManager->setAutoSave($this->configGroup->getConfigBool(ServerProperties::AUTO_SAVE, $this->worldManager->getAutoSave()));
 			$this->worldManager->setAutoSaveInterval($this->configGroup->getPropertyInt(Yml::TICKS_PER_AUTOSAVE, $this->worldManager->getAutoSaveInterval()));
 
-			$this->updater = new UpdateChecker($this, $this->configGroup->getPropertyString(Yml::AUTO_UPDATER_HOST, "update.pmmp.io"));
+			$this->updater = new UpdateChecker($this, $this->configGroup->getPropertyString(Yml::AUTO_UPDATER_HOST, "update.axolotl-pm.org"));
 
 			$this->queryInfo = new QueryInfo($this);
 
@@ -1121,12 +1122,12 @@ class Server{
 			$github = VersionInfo::GITHUB_URL;
 			$splash = "\n\n";
 			foreach([
-				KnownTranslationFactory::pocketmine_server_url_discord("{$highlight}https://discord.pmmp.io{$reset}"),
+				KnownTranslationFactory::pocketmine_server_url_discord("{$highlight}https://discord.axolotl-pm.org{$reset}"),
 				KnownTranslationFactory::pocketmine_server_url_docs("{$highlight}https://doc.pmmp.io{$reset}"),
 				KnownTranslationFactory::pocketmine_server_url_sourceCode("{$highlight}{$github}{$reset}"),
 				KnownTranslationFactory::pocketmine_server_url_freePlugins("{$highlight}https://poggit.pmmp.io/plugins{$reset}"),
 				KnownTranslationFactory::pocketmine_server_url_donations("{$highlight}https://patreon.com/pocketminemp{$reset}"),
-				KnownTranslationFactory::pocketmine_server_url_translations("{$highlight}https://translate.pocketmine.net{$reset}"),
+				KnownTranslationFactory::pocketmine_server_url_translations("{$highlight}https://translate.axolotl-pm.org{$reset}"),
 				KnownTranslationFactory::pocketmine_server_url_bugReporting("{$highlight}{$github}/issues{$reset}")
 			] as $link){
 				$splash .= "- " . $this->language->translate($link) . "\n";
@@ -1249,7 +1250,7 @@ class Server{
 					return false;
 				}
 				$creationOptions = WorldCreationOptions::create()
-					->setGeneratorClass($$generatorEntry->getGeneratorClass())
+					->setGeneratorClass($generatorEntry->getGeneratorClass())
 					->setGeneratorOptions($generatorOptions);
 				$convertedSeed = Generator::convertSeed($this->configGroup->getConfigString(ServerProperties::DEFAULT_WORLD_SEED));
 				if($convertedSeed !== null){
@@ -1328,6 +1329,18 @@ class Server{
 
 		if($useQuery){
 			$this->network->registerRawPacketHandler(new QueryHandler($this));
+		}
+
+		$netherNetBridgePort = $this->configGroup->getPropertyInt("network.nethernet-bridge-port", 0);
+		if($netherNetBridgePort > 0){
+			$this->network->registerInterface(new NetherNetInterface(
+				$this,
+				$this->network,
+				$netherNetBridgePort,
+				$packetBroadcaster,
+				$entityEventBroadcaster,
+				$typeConverter
+			));
 		}
 
 		foreach($this->getIPBans()->getEntries() as $entry){
@@ -1549,8 +1562,8 @@ class Server{
 		if($detect !== false){
 			$localName = stream_socket_get_name($detect, false);
 			fclose($detect);
-			$colonPos = strrpos($localName, ":");
-			if($colonPos !== false){
+			$colonPos = $localName !== false ? strrpos($localName, ":") : false;
+			if($localName !== false && $colonPos !== false){
 				$host = substr($localName, 0, $colonPos);
 			}
 		}

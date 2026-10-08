@@ -68,7 +68,7 @@ class Slab extends Transparent{
 			return true;
 		}
 
-		if($blockReplace instanceof Slab && $blockReplace->slabType !== SlabType::DOUBLE && $blockReplace->hasSameTypeId($this)){
+		if($blockReplace instanceof Slab && $this->canMergeWith($blockReplace)){
 			if($blockReplace->slabType === SlabType::TOP){ //Trying to combine with top slab
 				return $clickVector->y <= 0.5 || (!$isClickedBlock && $face === Facing::UP);
 			}else{
@@ -80,7 +80,7 @@ class Slab extends Transparent{
 	}
 
 	public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
-		if($blockReplace instanceof Slab && $blockReplace->slabType !== SlabType::DOUBLE && $blockReplace->hasSameTypeId($this) && (
+		if($blockReplace instanceof Slab && $this->canMergeWith($blockReplace) && (
 			($blockReplace->slabType === SlabType::TOP && ($clickVector->y <= 0.5 || $face === Facing::UP)) ||
 			($blockReplace->slabType === SlabType::BOTTOM && ($clickVector->y >= 0.5 || $face === Facing::DOWN))
 		)){
@@ -98,6 +98,10 @@ class Slab extends Transparent{
 			return [AxisAlignedBB::one()];
 		}
 		return [AxisAlignedBB::one()->trim($this->slabType === SlabType::TOP ? Facing::DOWN : Facing::UP, 0.5)];
+	}
+
+	protected function canMergeWith(Slab $other) : bool{
+		return $other->slabType !== SlabType::DOUBLE && $other->hasSameTypeId($this);
 	}
 
 	public function getSupportType(int $facing) : SupportType{

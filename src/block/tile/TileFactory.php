@@ -50,6 +50,7 @@ final class TileFactory{
 	private array $saveNames = [];
 
 	public function __construct(){
+		$this->register(PreservedTile::class);
 		$this->register(Barrel::class, ["Barrel", "minecraft:barrel"]);
 		$this->register(Banner::class, ["Banner", "minecraft:banner"]);
 		$this->register(Beacon::class, ["Beacon", "minecraft:beacon"]);
@@ -68,6 +69,7 @@ final class TileFactory{
 		$this->register(FlowerPot::class, ["FlowerPot", "minecraft:flower_pot"]);
 		$this->register(NormalFurnace::class, ["Furnace", "minecraft:furnace"]);
 		$this->register(Hopper::class, ["Hopper", "minecraft:hopper"]);
+		$this->register(Dropper::class, ["Dropper", "minecraft:dropper"]);
 		$this->register(ItemFrame::class, ["ItemFrame"]); //this is an entity in PC
 		$this->register(Jukebox::class, ["Jukebox", "RecordPlayer", "minecraft:jukebox"]);
 		$this->register(Lectern::class, ["Lectern", "minecraft:lectern"]);
@@ -130,6 +132,12 @@ final class TileFactory{
 	public function createFromData(World $world, CompoundTag $nbt) : ?Tile{
 		try{
 			$type = $nbt->getString(Tile::TAG_ID, "");
+			$pos = new Vector3($nbt->getInt(Tile::TAG_X), $nbt->getInt(Tile::TAG_Y), $nbt->getInt(Tile::TAG_Z));
+			if($world->getBlock($pos) instanceof \pocketmine\block\PreservedBlock){
+				$tile = new PreservedTile($world, $pos);
+				$tile->readSaveData($nbt);
+				return $tile;
+			}
 			if(!isset($this->knownTiles[$type])){
 				return null;
 			}

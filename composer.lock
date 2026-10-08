@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a40bc0ba4a3ca28dc8d84e3e9bb6802c",
+    "content-hash": "1d8d59f576908494e9b6284c9465ebcc",
     "packages": [
         {
             "name": "adhocore/json-comment",
@@ -64,6 +64,100 @@
                 }
             ],
             "time": "2022-10-02T11:22:07+00:00"
+        },
+        {
+            "name": "axolotl-pm/bedrock-block-upgrade-schema",
+            "version": "dev-bedrock-1.26.50",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/axolotl-pm/BedrockBlockUpgradeSchema.git",
+                "reference": "1510d436da148299c3a2cd56ab969aa83a6f927d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/axolotl-pm/BedrockBlockUpgradeSchema/zipball/1510d436da148299c3a2cd56ab969aa83a6f927d",
+                "reference": "1510d436da148299c3a2cd56ab969aa83a6f927d",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CC0-1.0"
+            ],
+            "description": "Schemas describing how to upgrade saved block data in older Minecraft: Bedrock Edition world saves",
+            "support": {
+                "issues": "https://github.com/axolotl-pm/BedrockBlockUpgradeSchema/issues",
+                "source": "https://github.com/axolotl-pm/BedrockBlockUpgradeSchema/tree/bedrock-1.26.50"
+            },
+            "time": "2026-08-24T13:03:33+00:00"
+        },
+        {
+            "name": "axolotl-pm/bedrock-item-upgrade-schema",
+            "version": "dev-bedrock-1.26.50",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/axolotl-pm/BedrockItemUpgradeSchema.git",
+                "reference": "3bf181b7b25f35530bdf049d4ac6cf518f9791b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/axolotl-pm/BedrockItemUpgradeSchema/zipball/3bf181b7b25f35530bdf049d4ac6cf518f9791b3",
+                "reference": "3bf181b7b25f35530bdf049d4ac6cf518f9791b3",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CC0-1.0"
+            ],
+            "description": "JSON schemas for upgrading items found in older Minecraft: Bedrock world saves",
+            "support": {
+                "issues": "https://github.com/axolotl-pm/BedrockItemUpgradeSchema/issues",
+                "source": "https://github.com/axolotl-pm/BedrockItemUpgradeSchema/tree/bedrock-1.26.50"
+            },
+            "time": "2026-08-17T11:32:13+00:00"
+        },
+        {
+            "name": "axolotl-pm/xoroshiro128pp",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/axolotl-pm/Xoroshiro128PP.git",
+                "reference": "02e3fb6bbfa53e0025c08b08e5e83b092cdef3eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/axolotl-pm/Xoroshiro128PP/zipball/02e3fb6bbfa53e0025c08b08e5e83b092cdef3eb",
+                "reference": "02e3fb6bbfa53e0025c08b08e5e83b092cdef3eb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gmp": "*",
+                "php": "^8.1",
+                "php-64bit": "*"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "2.2.8",
+                "phpstan/phpstan-phpunit": "^2.0.0",
+                "phpstan/phpstan-strict-rules": "^2.0.0",
+                "phpunit/phpunit": "^10.5.24"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "pocketmine\\xoroshiro128pp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "description": "Xoroshiro128++ random number generator for PocketMine-MP",
+            "support": {
+                "issues": "https://github.com/axolotl-pm/Xoroshiro128PP/issues",
+                "source": "https://github.com/axolotl-pm/Xoroshiro128PP/tree/0.1.0"
+            },
+            "time": "2026-08-25T14:15:14+00:00"
         },
         {
             "name": "brick/math",
@@ -127,16 +221,16 @@
         },
         {
             "name": "netresearch/jsonmapper",
-            "version": "v5.0.1",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cweiske/jsonmapper.git",
-                "reference": "980674efdda65913492d29a8fd51c82270dd37bb"
+                "reference": "31226dd465e3e38f5a8f66ef1393cd8daad248dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cweiske/jsonmapper/zipball/980674efdda65913492d29a8fd51c82270dd37bb",
-                "reference": "980674efdda65913492d29a8fd51c82270dd37bb",
+                "url": "https://api.github.com/repos/cweiske/jsonmapper/zipball/31226dd465e3e38f5a8f66ef1393cd8daad248dd",
+                "reference": "31226dd465e3e38f5a8f66ef1393cd8daad248dd",
                 "shasum": ""
             },
             "require": {
@@ -144,11 +238,13 @@
                 "ext-pcre": "*",
                 "ext-reflection": "*",
                 "ext-spl": "*",
-                "php": ">=7.1"
+                "php": ">=8.1"
             },
             "require-dev": {
+                "phpstan/phpstan": "^2.2",
                 "phpunit/phpunit": "~7.5 || ~8.0 || ~9.0 || ~10.0",
-                "squizlabs/php_codesniffer": "~3.5"
+                "psr/log": "^3.0",
+                "squizlabs/php_codesniffer": "^4.0"
             },
             "type": "library",
             "autoload": {
@@ -172,136 +268,9 @@
             "support": {
                 "email": "cweiske@cweiske.de",
                 "issues": "https://github.com/cweiske/jsonmapper/issues",
-                "source": "https://github.com/cweiske/jsonmapper/tree/v5.0.1"
+                "source": "https://github.com/cweiske/jsonmapper/tree/v6.0.0"
             },
-            "time": "2026-02-22T16:28:03+00:00"
-        },
-        {
-            "name": "pocketmine/bedrock-block-upgrade-schema",
-            "version": "5.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/TeamSelenyx/BedrockBlockUpgradeSchema.git",
-                "reference": "f4315998aa16071b5dd4b04fd068beabb5cf0ca4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/TeamSelenyx/BedrockBlockUpgradeSchema/zipball/f4315998aa16071b5dd4b04fd068beabb5cf0ca4",
-                "reference": "f4315998aa16071b5dd4b04fd068beabb5cf0ca4",
-                "shasum": ""
-            },
-            "type": "library",
-            "license": [
-                "CC0-1.0"
-            ],
-            "description": "Schemas describing how to upgrade saved block data in older Minecraft: Bedrock Edition world saves",
-            "support": {
-                "source": "https://github.com/TeamSelenyx/BedrockBlockUpgradeSchema/tree/5.4.0"
-            },
-            "time": "2026-09-20T00:34:33+00:00"
-        },
-        {
-            "name": "pocketmine/bedrock-data",
-            "version": "6.9.0+bedrock-1.26.50",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/TeamSelenyx/BedrockData.git",
-                "reference": "02eddfe3d6e592745900562e85750c905d758777"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/TeamSelenyx/BedrockData/zipball/02eddfe3d6e592745900562e85750c905d758777",
-                "reference": "02eddfe3d6e592745900562e85750c905d758777",
-                "shasum": ""
-            },
-            "type": "library",
-            "license": [
-                "CC0-1.0"
-            ],
-            "description": "Blobs of data generated from Minecraft: Bedrock Edition, used by PocketMine-MP",
-            "support": {
-                "source": "https://github.com/TeamSelenyx/BedrockData/tree/6.9.0+bedrock-1.26.50"
-            },
-            "time": "2026-09-20T00:35:55+00:00"
-        },
-        {
-            "name": "pocketmine/bedrock-item-upgrade-schema",
-            "version": "1.19.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/TeamSelenyx/BedrockItemUpgradeSchema.git",
-                "reference": "3398b922bb27121493c173a14b7ecd61d1b4e12c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/TeamSelenyx/BedrockItemUpgradeSchema/zipball/3398b922bb27121493c173a14b7ecd61d1b4e12c",
-                "reference": "3398b922bb27121493c173a14b7ecd61d1b4e12c",
-                "shasum": ""
-            },
-            "type": "library",
-            "license": [
-                "CC0-1.0"
-            ],
-            "description": "JSON schemas for upgrading items found in older Minecraft: Bedrock world saves",
-            "support": {
-                "source": "https://github.com/TeamSelenyx/BedrockItemUpgradeSchema/tree/1.19.0"
-            },
-            "time": "2026-09-20T00:59:53+00:00"
-        },
-        {
-            "name": "pocketmine/bedrock-protocol",
-            "version": "60.0.0+bedrock-1.26.50",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/TeamSelenyx/BedrockProtocol.git",
-                "reference": "cb9aa388a72efd2c80c075856c84ae15a89d96d8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/TeamSelenyx/BedrockProtocol/zipball/cb9aa388a72efd2c80c075856c84ae15a89d96d8",
-                "reference": "cb9aa388a72efd2c80c075856c84ae15a89d96d8",
-                "shasum": ""
-            },
-            "require": {
-                "ext-encoding": "~1.0.0",
-                "ext-json": "*",
-                "php": "^8.1",
-                "pocketmine/binaryutils": "^0.2.0",
-                "pocketmine/color": "^0.2.0 || ^0.3.0",
-                "pocketmine/math": "^0.3.0 || ^0.4.0 || ^1.0.0",
-                "pocketmine/nbt": "^1.0.0",
-                "ramsey/uuid": "^4.1"
-            },
-            "require-dev": {
-                "phpstan/phpstan": "2.1.0",
-                "phpstan/phpstan-phpunit": "^2.0.0",
-                "phpstan/phpstan-strict-rules": "^2.0.0",
-                "phpunit/phpunit": "^9.5 || ^10.0 || ^11.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "pocketmine\\network\\mcpe\\protocol\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "pocketmine\\network\\mcpe\\protocol\\": "tests/phpunit/"
-                }
-            },
-            "scripts": {
-                "update-create-methods": [
-                    "@php tools/generate-create-static-methods.php"
-                ]
-            },
-            "license": [
-                "LGPL-3.0"
-            ],
-            "description": "An implementation of the Minecraft: Bedrock Edition protocol in PHP",
-            "support": {
-                "source": "https://github.com/TeamSelenyx/BedrockProtocol/tree/60.0.0+bedrock-1.26.50"
-            },
-            "time": "2026-09-20T01:00:38+00:00"
+            "time": "2026-06-29T16:03:16+00:00"
         },
         {
             "name": "pocketmine/binaryutils",
@@ -954,6 +923,47 @@
                 }
             ],
             "time": "2026-08-23T07:59:31+00:00"
+        },
+        {
+            "name": "teamselenyx/bedrock-data",
+            "version": "dev-bedrock-1.26.60",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/TeamSelenyx/BedrockData/archive/846a0fdc8fa8d34d7fa7cec4d7f33639f1c8e16b.zip",
+                "reference": "846a0fdc8fa8d34d7fa7cec4d7f33639f1c8e16b"
+            },
+            "type": "library",
+            "license": [
+                "CC0-1.0"
+            ]
+        },
+        {
+            "name": "teamselenyx/bedrock-protocol",
+            "version": "dev-bedrock-1.26.60",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/TeamSelenyx/BedrockProtocol/archive/6b8d5ab28e675d18d35fa175c6c90b25f1589e6d.zip",
+                "reference": "6b8d5ab28e675d18d35fa175c6c90b25f1589e6d"
+            },
+            "require": {
+                "ext-encoding": "~1.0.0",
+                "ext-json": "*",
+                "php": "^8.1",
+                "pocketmine/binaryutils": "^0.2.0",
+                "pocketmine/color": "^0.2.0 || ^0.3.0",
+                "pocketmine/math": "^0.3.0 || ^0.4.0 || ^1.0.0",
+                "pocketmine/nbt": "^1.0.0",
+                "ramsey/uuid": "^4.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "pocketmine\\network\\mcpe\\protocol\\": "src/"
+                }
+            },
+            "license": [
+                "LGPL-3.0"
+            ]
         }
     ],
     "packages-dev": [
@@ -2772,7 +2782,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "axolotl-pm/bedrock-block-upgrade-schema": 20,
+        "axolotl-pm/bedrock-item-upgrade-schema": 20,
+        "teamselenyx/bedrock-data": 20,
+        "teamselenyx/bedrock-protocol": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

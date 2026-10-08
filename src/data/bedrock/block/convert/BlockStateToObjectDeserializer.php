@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\data\bedrock\block\convert;
 
 use pocketmine\block\Block;
+use pocketmine\block\PreservedBlockRegistry;
 use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\Slab;
 use pocketmine\block\Stair;
@@ -121,7 +122,15 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 	}
 
 	/** @throws BlockStateDeserializeException */
-	public function deserializeBlock(BlockStateData $blockStateData) : Block{
+	public function deserializeBlock(BlockStateData $blockStateData, bool $preserveUnsupported = true) : Block{
+		try{
+			return $this->deserializeBlockStrict($blockStateData);
+		}catch(BlockStateDeserializeException $e){
+			return ($preserveUnsupported ? PreservedBlockRegistry::getInstance()->lookup($blockStateData) : null) ?? throw $e;
+		}
+	}
+
+	private function deserializeBlockStrict(BlockStateData $blockStateData) : Block{
 		$id = $blockStateData->getName();
 		if(!array_key_exists($id, $this->deserializeFuncs)){
 			throw new UnsupportedBlockStateException("Unknown block ID \"$id\"");

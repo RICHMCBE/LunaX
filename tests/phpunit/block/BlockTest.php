@@ -120,6 +120,11 @@ class BlockTest extends TestCase{
 		$hardnessErrors = [];
 		$blastResistanceErrors = [];
 		foreach($this->blockFactory->getAllKnownStates() as $block){
+			if($block instanceof PreservedBlock){
+				//Display-only blocks intentionally cannot be mined; lossless state coverage is tested separately.
+				self::assertSame(-1.0, $block->getBreakInfo()->getHardness());
+				continue;
+			}
 			$vanillaId = $serializer->serializeBlock($block)->getName();
 			if(isset($exceptions[$vanillaId]) || isset($testedBlocks[$vanillaId])){
 				continue;
@@ -136,7 +141,7 @@ class BlockTest extends TestCase{
 			$testedBlocks[$vanillaId] = true;
 
 			$vanillaHardness = round($propertiesTable[$vanillaId]["hardness"], 5);
-			$vanillaBlastResistance = round($propertiesTable[$vanillaId]["blastResistance"], 5) * 5;
+			$vanillaBlastResistance = round($propertiesTable[$vanillaId]["blastResistance"] * 5, 5);
 
 			$breakInfo = $block->getBreakInfo();
 			if($breakInfo->getHardness() !== $vanillaHardness){
@@ -170,6 +175,9 @@ class BlockTest extends TestCase{
 		}
 
 		foreach($blockStateRegistry->getAllKnownStates() as $index => $block){
+			if($block instanceof PreservedBlock){
+				continue; //Palette-derived compatibility states are covered by PreservedBlockTest.
+			}
 			if($index !== $block->getStateId()){
 				throw new AssumptionFailedError("State index should always match state ID");
 			}

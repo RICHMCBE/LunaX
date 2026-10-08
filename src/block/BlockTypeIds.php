@@ -872,6 +872,7 @@ final class BlockTypeIds{
 	public const WET_POTENT_SULFUR = 10842;
 	public const CONTINUOUS_POTENT_SULFUR = 10843;
 	public const CYCLING_POTENT_SULFUR = 10844;
+
 	public const CINNABAR = 10845;
 	public const CINNABAR_SLAB = 10846;
 	public const CINNABAR_STAIRS = 10847;
@@ -886,7 +887,36 @@ final class BlockTypeIds{
 	public const CINNABAR_BRICK_STAIRS = 10856;
 	public const CINNABAR_BRICK_WALL = 10857;
 
-	public const FIRST_UNUSED_BLOCK_ID = 10858;
+	public const LEAF_LITTER = 10858;
+	public const BUBBLE_COLUMN = 10859;
+
+	public const CONCRETE_SLAB = 10860;
+	public const CONCRETE_STAIRS = 10861;
+	public const WOOL_SLAB = 10862;
+	public const WOOL_STAIRS = 10863;
+
+	public const POPLAR_BUTTON = 10864;
+	public const POPLAR_DOOR = 10865;
+	public const POPLAR_FENCE = 10866;
+	public const POPLAR_FENCE_GATE = 10867;
+	public const POPLAR_LOG = 10868;
+	public const POPLAR_PLANKS = 10869;
+	public const POPLAR_PRESSURE_PLATE = 10870;
+	public const POPLAR_SIGN = 10871;
+	public const POPLAR_SLAB = 10872;
+	public const POPLAR_STAIRS = 10873;
+	public const POPLAR_TRAPDOOR = 10874;
+	public const POPLAR_WALL_SIGN = 10875;
+	public const POPLAR_WOOD = 10876;
+	public const POPLAR_CEILING_CENTER_HANGING_SIGN = 10877;
+	public const POPLAR_CEILING_EDGES_HANGING_SIGN = 10878;
+	public const POPLAR_WALL_HANGING_SIGN = 10879;
+	public const DROPPER = 10880;
+
+	//Reserved for deterministic display-only palette registrations; never allocate plugin IDs here.
+	public const PRESERVED_BLOCK_ID_START = 20000;
+	public const PRESERVED_BLOCK_ID_END = 21999;
+	public const FIRST_UNUSED_BLOCK_ID = 22000;
 
 	private static int $nextDynamicId = self::FIRST_UNUSED_BLOCK_ID;
 

@@ -57,7 +57,6 @@ class Stair extends Transparent implements HorizontalFacing{
 		}elseif(($frontFacing = $this->getPossibleCornerFacing(true)) !== null){
 			return $frontFacing === $clockwise ? StairShape::INNER_RIGHT : StairShape::INNER_LEFT;
 		}
-
 		return StairShape::STRAIGHT;
 	}
 
