@@ -23,8 +23,8 @@ async def capability(self: HttpSignalingServer, request: web.Request) -> web.Res
     logging.info("capability request from %s", request.remote)
     return web.json_response({
         "name": "LunaX Preview Probe",
-        "protocol": 2211,
-        "version": "1.26.60.25",
+        "protocol": 2225,
+        "version": "1.26.60.30",
         "level": "world",
         "players": 0,
         "maxPlayers": 20,
