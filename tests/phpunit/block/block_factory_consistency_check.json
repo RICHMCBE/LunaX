@@ -1,5 +1,12 @@
 {
     "stateCounts": {
+        "DROPPER": 12,
+        "CONCRETE_SLAB": 48,
+        "CONCRETE_STAIRS": 640,
+        "WOOL_SLAB": 48,
+        "WOOL_STAIRS": 640,
+        "LEAF_LITTER": 16,
+        "BUBBLE_COLUMN": 2,
         "ACACIA_BUTTON": 12,
         "ACACIA_CEILING_CENTER_HANGING_SIGN": 16,
         "ACACIA_CEILING_EDGES_HANGING_SIGN": 4,
@@ -829,9 +836,26 @@
         "WHEAT": 8,
         "WHITE_TULIP": 1,
         "WITHER_ROSE": 1,
-        "WOOL": 16
+        "WOOL": 16,
+        "POPLAR_BUTTON": 12,
+        "POPLAR_CEILING_CENTER_HANGING_SIGN": 16,
+        "POPLAR_CEILING_EDGES_HANGING_SIGN": 4,
+        "POPLAR_DOOR": 32,
+        "POPLAR_FENCE": 16,
+        "POPLAR_FENCE_GATE": 16,
+        "POPLAR_LOG": 6,
+        "POPLAR_PLANKS": 1,
+        "POPLAR_PRESSURE_PLATE": 2,
+        "POPLAR_SIGN": 16,
+        "POPLAR_SLAB": 3,
+        "POPLAR_STAIRS": 40,
+        "POPLAR_TRAPDOOR": 16,
+        "POPLAR_WALL_HANGING_SIGN": 4,
+        "POPLAR_WALL_SIGN": 4,
+        "POPLAR_WOOD": 6
     },
     "tiles": {
+        "DROPPER": "pocketmine\\block\\tile\\Dropper",
         "ACACIA_CEILING_CENTER_HANGING_SIGN": "pocketmine\\block\\tile\\HangingSign",
         "ACACIA_CEILING_EDGES_HANGING_SIGN": "pocketmine\\block\\tile\\HangingSign",
         "ACACIA_SIGN": "pocketmine\\block\\tile\\Sign",
@@ -931,6 +955,11 @@
         "WARPED_WALL_HANGING_SIGN": "pocketmine\\block\\tile\\HangingSign",
         "WARPED_WALL_SIGN": "pocketmine\\block\\tile\\Sign",
         "WATER_CAULDRON": "pocketmine\\block\\tile\\Cauldron",
-        "WET_POTENT_SULFUR": "pocketmine\\block\\tile\\PotentSulfur"
+        "WET_POTENT_SULFUR": "pocketmine\\block\\tile\\PotentSulfur",
+        "POPLAR_CEILING_CENTER_HANGING_SIGN": "pocketmine\\block\\tile\\HangingSign",
+        "POPLAR_CEILING_EDGES_HANGING_SIGN": "pocketmine\\block\\tile\\HangingSign",
+        "POPLAR_SIGN": "pocketmine\\block\\tile\\Sign",
+        "POPLAR_WALL_HANGING_SIGN": "pocketmine\\block\\tile\\HangingSign",
+        "POPLAR_WALL_SIGN": "pocketmine\\block\\tile\\Sign"
     }
 }
