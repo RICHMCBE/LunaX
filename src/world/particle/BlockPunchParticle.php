@@ -39,6 +39,7 @@ class BlockPunchParticle implements Particle{
 	){}
 
 	public function encode(Vector3 $pos) : array{
-		return [LevelEventPacket::create(LevelEvent::PARTICLE_PUNCH_BLOCK, TypeConverter::getInstance()->getBlockTranslator()->internalIdToNetworkId($this->block->getStateId()) | ($this->face << 24), $pos)];
+		//Hash IDs use all 32 bits; the face must be carried by the event ID instead.
+		return [LevelEventPacket::create(LevelEvent::PARTICLE_PUNCH_BLOCK_DOWN + $this->face, TypeConverter::getInstance()->getBlockTranslator()->internalIdToNetworkId($this->block->getStateId()), $pos)];
 	}
 }
