@@ -87,6 +87,8 @@ class PreSpawnPacketHandler extends PacketHandler{
 			$levelSettings->hasAchievementsDisabled = true;
 			$levelSettings->time = $world->getTime();
 			$levelSettings->eduEditionOffer = 0;
+			// The creative catalog includes elements and hardened glass; clients must enable their definitions.
+			$levelSettings->hasEduFeaturesEnabled = true;
 			$levelSettings->rainLevel = 0; //TODO: implement these properly
 			$levelSettings->lightningLevel = 0;
 			$levelSettings->commandsEnabled = true;
@@ -117,7 +119,7 @@ class PreSpawnPacketHandler extends PacketHandler{
 				sprintf("%s %s", VersionInfo::NAME, VersionInfo::VERSION()->getFullVersion(true)),
 				Uuid::fromString(Uuid::NIL),
 				false,
-				false,
+				true, //blockNetworkIdsAreHashes: must match BlockStateDictionary
 				new NetworkPermissions(disableClientSounds: true),
 				null,
 				new ServerTelemetryData("", "", "", ""),
