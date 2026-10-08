@@ -43,6 +43,9 @@ use const JSON_THROW_ON_ERROR;
  * Handles translation of network block runtime IDs into blockstate data, and vice versa
  */
 final class BlockStateDictionary{
+	/** @var array<int, BlockStateDictionaryEntry> */
+	private array $states = [];
+
 	/**
 	 * @var int[][]|int[]
 	 * @phpstan-var array<string, array<string, int>|int>
@@ -61,10 +64,15 @@ final class BlockStateDictionary{
 	 * @phpstan-param list<BlockStateDictionaryEntry> $states
 	 */
 	public function __construct(
-		private array $states
+		array $states
 	){
 		$table = [];
-		foreach($this->states as $stateId => $stateNbt){
+		foreach($states as $stateNbt){
+			$stateId = $stateNbt->getNetworkId();
+			if(isset($this->states[$stateId])){
+				throw new \InvalidArgumentException("Duplicate block network hash $stateId for " . $stateNbt->getStateName());
+			}
+			$this->states[$stateId] = $stateNbt;
 			$table[$stateNbt->getStateName()][$stateNbt->getRawStateProperties()] = $stateId;
 		}
 
@@ -106,6 +114,8 @@ final class BlockStateDictionary{
 	}
 
 	public function generateDataFromStateId(int $networkRuntimeId) : ?BlockStateData{
+		//Some packets carry the same 32 bits as an unsigned varint (e.g. inventory stacks).
+		$networkRuntimeId = ($networkRuntimeId & 0x7fffffff) - ($networkRuntimeId & 0x80000000);
 		return ($this->states[$networkRuntimeId] ?? null)?->generateStateData();
 	}
 
@@ -129,6 +139,7 @@ final class BlockStateDictionary{
 	 * This is used for serializing crafting recipe inputs.
 	 */
 	public function getMetaFromStateId(int $networkRuntimeId) : ?int{
+		$networkRuntimeId = ($networkRuntimeId & 0x7fffffff) - ($networkRuntimeId & 0x80000000);
 		return ($this->states[$networkRuntimeId] ?? null)?->getMeta();
 	}
 
