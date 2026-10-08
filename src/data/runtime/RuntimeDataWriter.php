@@ -73,7 +73,7 @@ final class RuntimeDataWriter implements RuntimeDataDescriber{
 		if($value < $min || $value > $max){
 			throw new \InvalidArgumentException("Value $value is outside the range $min - $max");
 		}
-		$bits = ((int) log($max - $min, 2)) + 1;
+		$bits = ($min === $max ? 1 : ((int) log($max - $min, 2)) + 1);
 		$this->writeInt($bits, $value - $min);
 	}
 
