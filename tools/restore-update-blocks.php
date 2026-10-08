@@ -33,7 +33,9 @@ use pocketmine\utils\Binary;
 use pocketmine\utils\Utils;
 use pocketmine\world\format\PalettedBlockArray;
 
-/** @return array{string, list<array{PalettedBlockArray, list<CompoundTag>}>} */
+/**
+ * @return array{string, list<array{PalettedBlockArray, list<CompoundTag>}>}
+ */
 function decodeRecoverySubChunk(string $raw) : array{
 	$version = ord($raw[0]);
 	if($version !== 8 && $version !== 9){
@@ -66,7 +68,9 @@ function decodeRecoverySubChunk(string $raw) : array{
 	return [$header, $layers];
 }
 
-/** @param list<array{PalettedBlockArray, list<CompoundTag>}> $layers */
+/**
+ * @param list<array{PalettedBlockArray, list<CompoundTag>}> $layers
+ */
 function encodeRecoverySubChunk(string $header, array $layers) : string{
 	$result = $header;
 	$nbt = new LittleEndianNbtSerializer();
