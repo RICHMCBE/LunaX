@@ -58,7 +58,7 @@ final class RuntimeDataSizeCalculator implements RuntimeDataDescriber{
 	}
 
 	public function boundedIntAuto(int $min, int $max, int &$value) : void{
-		$this->addBits(((int) log($max - $min, 2)) + 1);
+		$this->addBits(($min === $max ? 1 : ((int) log($max - $min, 2)) + 1));
 	}
 
 	public function bool(bool &$value) : void{
